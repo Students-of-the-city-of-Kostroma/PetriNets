@@ -12,16 +12,6 @@ namespace PetriNetsClassLibrary
 		List<MPlace> outPlaces;
 		bool isEnable;
 
-		public void inPlacesAdd(MPlace mPlaceIn)
-		{
-			inPlaces.Add(mPlaceIn);
-		}
-
-		public void outPlacesAdd(MPlace mPlaceOut)
-		{
-			outPlaces.Add(mPlaceOut);
-		}
-
 		public string label
 		{
 			get;set;
