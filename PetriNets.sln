@@ -5,6 +5,10 @@ VisualStudioVersion = 15.0.28307.539
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PetriNets", "PetriNets\PetriNets.csproj", "{43334532-E2DE-4CCA-A06D-2C10D4A1AC24}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PetriNetsClassLibrary", "PetriNetsClassLibrary\PetriNetsClassLibrary.csproj", "{6FBECF50-F7CC-4250-9D76-E4DAB2011658}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTestPetriNets", "UnitTestPetriNets\UnitTestPetriNets.csproj", "{FE82DA3F-664D-4289-9864-A57166FD5BED}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{43334532-E2DE-4CCA-A06D-2C10D4A1AC24}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{43334532-E2DE-4CCA-A06D-2C10D4A1AC24}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{43334532-E2DE-4CCA-A06D-2C10D4A1AC24}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6FBECF50-F7CC-4250-9D76-E4DAB2011658}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6FBECF50-F7CC-4250-9D76-E4DAB2011658}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6FBECF50-F7CC-4250-9D76-E4DAB2011658}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6FBECF50-F7CC-4250-9D76-E4DAB2011658}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FE82DA3F-664D-4289-9864-A57166FD5BED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE82DA3F-664D-4289-9864-A57166FD5BED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE82DA3F-664D-4289-9864-A57166FD5BED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE82DA3F-664D-4289-9864-A57166FD5BED}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
