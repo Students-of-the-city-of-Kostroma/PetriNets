@@ -6,22 +6,11 @@ using System.Threading.Tasks;
 
 namespace PetriNetsClassLibrary
 {
-	class MPlace : Model
+	abstract class Model
 	{
-
-		public uint tokens
+		public Model()
 		{
-			get; set;
-		}
 
-		public string label
-		{
-			get; set;
-		}
-
-		MPlace(string _label)
-		{
-			label = _label;
 		}
 	}
 }
