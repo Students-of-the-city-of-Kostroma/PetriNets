@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace PetriNetsClassLibrary
 {
-	class MTransition
+	class MTransition : Model
 	{
 		List<MPlace> inPlaces;
 		List<MPlace> outPlaces;
