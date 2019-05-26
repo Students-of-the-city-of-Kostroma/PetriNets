@@ -41,10 +41,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CArc.cs" />
+    <Compile Include="CPlace.cs" />
+    <Compile Include="CTransition.cs" />
     <Compile Include="Edge.cs" />
     <Compile Include="MArc.cs" />
+    <Compile Include="Model.cs" />
     <Compile Include="MPlace.cs" />
     <Compile Include="MTransition.cs" />
+    <Compile Include="PetriNet.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

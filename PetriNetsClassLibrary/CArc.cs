@@ -6,22 +6,20 @@ using System.Threading.Tasks;
 
 namespace PetriNetsClassLibrary
 {
-	public class MPlace : Model
+	public class CArc
 	{
-
-		public uint tokens
+		private List<MArc> _allArcs;
+		public List<MArc> allArcs
 		{
-			get; set;
+			get
+			{
+				return _allArcs;
+			}
 		}
 
-		public string label
+		public CArc()
 		{
-			get; set;
-		}
-
-		MPlace(string _label)
-		{
-			label = _label;
+			_allArcs = new List<MArc>();
 		}
 	}
 }

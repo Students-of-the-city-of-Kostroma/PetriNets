@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace PetriNetsClassLibrary
 {
-	class MArc : Model
+	public class MArc : Model
 	{
 		public uint weight
 		{
