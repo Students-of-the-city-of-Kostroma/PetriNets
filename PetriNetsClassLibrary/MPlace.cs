@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace PetriNetsClassLibrary
 {
-	class MPlace : Model
+	public class MPlace : Model
 	{
 
 		public uint tokens

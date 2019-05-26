@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace PetriNetsClassLibrary
 {
-	abstract class Model
+	public abstract class Model
 	{
 		public Model()
 		{
