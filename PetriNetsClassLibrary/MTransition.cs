@@ -8,8 +8,8 @@ namespace PetriNetsClassLibrary
 {
 	class MTransition : Model
 	{
-		List<MPlace> inPlaces;
-		List<MPlace> outPlaces;
+		List<MArc> inPlaces;
+		List<MArc> outPlaces;
 		bool isEnable;
 
 		public string label
