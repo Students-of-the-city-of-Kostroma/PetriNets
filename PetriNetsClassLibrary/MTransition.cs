@@ -17,7 +17,7 @@ namespace PetriNetsClassLibrary
 			get;set;
 		}
 
-		MTransition(string _label)
+		public MTransition(string _label)
 		{
 			isEnable = false;
 			label = _label;
