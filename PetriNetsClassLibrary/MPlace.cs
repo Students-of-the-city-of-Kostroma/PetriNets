@@ -19,7 +19,7 @@ namespace PetriNetsClassLibrary
 			get; set;
 		}
 
-		MPlace(string _label)
+		public MPlace(string _label)
 		{
 			label = _label;
 		}

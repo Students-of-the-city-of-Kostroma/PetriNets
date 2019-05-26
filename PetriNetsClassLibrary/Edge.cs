@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace PetriNetsClassLibrary
 {
-	class Edge
+	public class Edge
 	{
 		public Tuple<MPlace, MTransition> edge
 		{
