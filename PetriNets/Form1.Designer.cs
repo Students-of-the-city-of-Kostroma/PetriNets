@@ -31,16 +31,17 @@
 			this.components = new System.ComponentModel.Container();
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
 			this.bindingNavigator1 = new System.Windows.Forms.BindingNavigator(this.components);
-			this.bindingNavigatorDeleteItem = new System.Windows.Forms.ToolStripButton();
+			this.bindingNavigatorSeparator2 = new System.Windows.Forms.ToolStripSeparator();
 			this.bindingNavigatorMoveFirstItem = new System.Windows.Forms.ToolStripButton();
 			this.bindingNavigatorMoveNextItem = new System.Windows.Forms.ToolStripButton();
 			this.pause = new System.Windows.Forms.ToolStripButton();
 			this.stop = new System.Windows.Forms.ToolStripButton();
 			this.bindingNavigatorMoveLastItem = new System.Windows.Forms.ToolStripButton();
-			this.bindingNavigatorSeparator2 = new System.Windows.Forms.ToolStripSeparator();
 			this.circle = new System.Windows.Forms.ToolStripButton();
 			this.rectangle = new System.Windows.Forms.ToolStripButton();
 			this.line = new System.Windows.Forms.ToolStripButton();
+			this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
+			this.toolStripButton2 = new System.Windows.Forms.ToolStripButton();
 			((System.ComponentModel.ISupportInitialize)(this.bindingNavigator1)).BeginInit();
 			this.bindingNavigator1.SuspendLayout();
 			this.SuspendLayout();
@@ -49,7 +50,7 @@
 			// 
 			this.bindingNavigator1.AddNewItem = null;
 			this.bindingNavigator1.CountItem = null;
-			this.bindingNavigator1.DeleteItem = this.bindingNavigatorDeleteItem;
+			this.bindingNavigator1.DeleteItem = null;
 			this.bindingNavigator1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.bindingNavigatorMoveFirstItem,
             this.bindingNavigatorMoveNextItem,
@@ -57,10 +58,11 @@
             this.stop,
             this.bindingNavigatorMoveLastItem,
             this.bindingNavigatorSeparator2,
-            this.bindingNavigatorDeleteItem,
             this.circle,
             this.rectangle,
-            this.line});
+            this.line,
+            this.toolStripButton1,
+            this.toolStripButton2});
 			this.bindingNavigator1.Location = new System.Drawing.Point(0, 0);
 			this.bindingNavigator1.MoveFirstItem = this.bindingNavigatorMoveFirstItem;
 			this.bindingNavigator1.MoveLastItem = this.bindingNavigatorMoveLastItem;
@@ -72,15 +74,10 @@
 			this.bindingNavigator1.TabIndex = 0;
 			this.bindingNavigator1.Text = "bindingNavigator1";
 			// 
-			// bindingNavigatorDeleteItem
+			// bindingNavigatorSeparator2
 			// 
-			this.bindingNavigatorDeleteItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.bindingNavigatorDeleteItem.Image = ((System.Drawing.Image)(resources.GetObject("bindingNavigatorDeleteItem.Image")));
-			this.bindingNavigatorDeleteItem.Name = "bindingNavigatorDeleteItem";
-			this.bindingNavigatorDeleteItem.RightToLeftAutoMirrorImage = true;
-			this.bindingNavigatorDeleteItem.Size = new System.Drawing.Size(23, 22);
-			this.bindingNavigatorDeleteItem.Text = "Удалить";
-			this.bindingNavigatorDeleteItem.Click += new System.EventHandler(this.bindingNavigatorDeleteItem_Click);
+			this.bindingNavigatorSeparator2.Name = "bindingNavigatorSeparator2";
+			this.bindingNavigatorSeparator2.Size = new System.Drawing.Size(6, 25);
 			// 
 			// bindingNavigatorMoveFirstItem
 			// 
@@ -127,11 +124,6 @@
 			this.bindingNavigatorMoveLastItem.Size = new System.Drawing.Size(23, 22);
 			this.bindingNavigatorMoveLastItem.Text = "Переместить в конец";
 			// 
-			// bindingNavigatorSeparator2
-			// 
-			this.bindingNavigatorSeparator2.Name = "bindingNavigatorSeparator2";
-			this.bindingNavigatorSeparator2.Size = new System.Drawing.Size(6, 25);
-			// 
 			// circle
 			// 
 			this.circle.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
@@ -150,7 +142,7 @@
 			this.rectangle.Name = "rectangle";
 			this.rectangle.Size = new System.Drawing.Size(23, 22);
 			this.rectangle.Text = "toolStripButton2";
-			this.rectangle.Click += new System.EventHandler(this.Rectangle_Click);
+			this.rectangle.Click += new System.EventHandler(this.rectangle_Click);
 			// 
 			// line
 			// 
@@ -160,6 +152,27 @@
 			this.line.Name = "line";
 			this.line.Size = new System.Drawing.Size(23, 22);
 			this.line.Text = "toolStripButton3";
+			this.line.Click += new System.EventHandler(this.line_Click);
+			// 
+			// toolStripButton1
+			// 
+			this.toolStripButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.toolStripButton1.Image = global::PetriNets.Properties.Resources.cursour;
+			this.toolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.toolStripButton1.Name = "toolStripButton1";
+			this.toolStripButton1.Size = new System.Drawing.Size(23, 22);
+			this.toolStripButton1.Text = "toolStripButton1";
+			this.toolStripButton1.Click += new System.EventHandler(this.toolStripButton1_Click);
+			// 
+			// toolStripButton2
+			// 
+			this.toolStripButton2.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.toolStripButton2.Image = global::PetriNets.Properties.Resources.cross;
+			this.toolStripButton2.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.toolStripButton2.Name = "toolStripButton2";
+			this.toolStripButton2.Size = new System.Drawing.Size(23, 22);
+			this.toolStripButton2.Text = "toolStripButton2";
+			this.toolStripButton2.Click += new System.EventHandler(this.toolStripButton2_Click);
 			// 
 			// Form1
 			// 
@@ -169,7 +182,7 @@
 			this.Controls.Add(this.bindingNavigator1);
 			this.Name = "Form1";
 			this.Text = "Сети Петри";
-			this.MouseClick += new System.Windows.Forms.MouseEventHandler(this.Form1_MouseClick);
+			this.Click += new System.EventHandler(this.CanvasClick);
 			((System.ComponentModel.ISupportInitialize)(this.bindingNavigator1)).EndInit();
 			this.bindingNavigator1.ResumeLayout(false);
 			this.bindingNavigator1.PerformLayout();
@@ -181,7 +194,6 @@
 		#endregion
 
 		private System.Windows.Forms.BindingNavigator bindingNavigator1;
-		private System.Windows.Forms.ToolStripButton bindingNavigatorDeleteItem;
 		private System.Windows.Forms.ToolStripButton bindingNavigatorMoveFirstItem;
 		private System.Windows.Forms.ToolStripButton bindingNavigatorMoveNextItem;
 		private System.Windows.Forms.ToolStripButton bindingNavigatorMoveLastItem;
@@ -191,5 +203,7 @@
 		private System.Windows.Forms.ToolStripButton line;
 		private System.Windows.Forms.ToolStripButton pause;
 		private System.Windows.Forms.ToolStripButton stop;
+		private System.Windows.Forms.ToolStripButton toolStripButton1;
+		private System.Windows.Forms.ToolStripButton toolStripButton2;
 	}
 }
