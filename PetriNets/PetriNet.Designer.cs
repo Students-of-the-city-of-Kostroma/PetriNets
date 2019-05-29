@@ -153,6 +153,7 @@
 			this.line.Size = new System.Drawing.Size(23, 22);
 			this.line.Text = "toolStripButton3";
 			this.line.Click += new System.EventHandler(this.line_Click);
+			this.line.MouseMove += new System.Windows.Forms.MouseEventHandler(this.line_MouseMove);
 			// 
 			// toolStripButton1
 			// 
@@ -174,13 +175,13 @@
 			this.toolStripButton2.Text = "toolStripButton2";
 			this.toolStripButton2.Click += new System.EventHandler(this.toolStripButton2_Click);
 			// 
-			// Form1
+			// PetriNet
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(800, 450);
 			this.Controls.Add(this.bindingNavigator1);
-			this.Name = "Form1";
+			this.Name = "PetriNet";
 			this.Text = "Сети Петри";
 			this.Click += new System.EventHandler(this.CanvasClick);
 			this.DoubleClick += new System.EventHandler(this.Form1_DoubleClick);
