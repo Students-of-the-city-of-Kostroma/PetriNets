@@ -1,6 +1,6 @@
 ﻿namespace PetriNets
 {
-	partial class Form1
+	partial class PetriNet
 	{
 		/// <summary>
 		/// Required designer variable.
@@ -29,14 +29,14 @@
 		private void InitializeComponent()
 		{
 			this.components = new System.ComponentModel.Container();
-			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(PetriNet));
 			this.bindingNavigator1 = new System.Windows.Forms.BindingNavigator(this.components);
-			this.bindingNavigatorSeparator2 = new System.Windows.Forms.ToolStripSeparator();
 			this.bindingNavigatorMoveFirstItem = new System.Windows.Forms.ToolStripButton();
 			this.bindingNavigatorMoveNextItem = new System.Windows.Forms.ToolStripButton();
 			this.pause = new System.Windows.Forms.ToolStripButton();
 			this.stop = new System.Windows.Forms.ToolStripButton();
 			this.bindingNavigatorMoveLastItem = new System.Windows.Forms.ToolStripButton();
+			this.bindingNavigatorSeparator2 = new System.Windows.Forms.ToolStripSeparator();
 			this.circle = new System.Windows.Forms.ToolStripButton();
 			this.rectangle = new System.Windows.Forms.ToolStripButton();
 			this.line = new System.Windows.Forms.ToolStripButton();
@@ -73,11 +73,6 @@
 			this.bindingNavigator1.Size = new System.Drawing.Size(800, 25);
 			this.bindingNavigator1.TabIndex = 0;
 			this.bindingNavigator1.Text = "bindingNavigator1";
-			// 
-			// bindingNavigatorSeparator2
-			// 
-			this.bindingNavigatorSeparator2.Name = "bindingNavigatorSeparator2";
-			this.bindingNavigatorSeparator2.Size = new System.Drawing.Size(6, 25);
 			// 
 			// bindingNavigatorMoveFirstItem
 			// 
@@ -123,6 +118,11 @@
 			this.bindingNavigatorMoveLastItem.RightToLeftAutoMirrorImage = true;
 			this.bindingNavigatorMoveLastItem.Size = new System.Drawing.Size(23, 22);
 			this.bindingNavigatorMoveLastItem.Text = "Переместить в конец";
+			// 
+			// bindingNavigatorSeparator2
+			// 
+			this.bindingNavigatorSeparator2.Name = "bindingNavigatorSeparator2";
+			this.bindingNavigatorSeparator2.Size = new System.Drawing.Size(6, 25);
 			// 
 			// circle
 			// 
@@ -183,6 +183,7 @@
 			this.Name = "Form1";
 			this.Text = "Сети Петри";
 			this.Click += new System.EventHandler(this.CanvasClick);
+			this.DoubleClick += new System.EventHandler(this.Form1_DoubleClick);
 			((System.ComponentModel.ISupportInitialize)(this.bindingNavigator1)).EndInit();
 			this.bindingNavigator1.ResumeLayout(false);
 			this.bindingNavigator1.PerformLayout();
