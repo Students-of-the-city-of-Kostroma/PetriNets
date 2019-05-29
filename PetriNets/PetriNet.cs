@@ -12,14 +12,15 @@ using PetriNetsClassLibrary;
 
 namespace PetriNets
 {
-	public partial class Form1 : Form
+	public partial class PetriNet : Form
 	{
 		public List<IShape> Shapes { get; private set; }
 		delegate void DrawPetriNetElement(Point location);
 		DrawPetriNetElement DrawElement;
 		bool isDeliting;
+		int unicalLabelId = 0;
 
-		public Form1()
+		public PetriNet()
 		{
 			InitializeComponent();
 			DoubleBuffered = true;
@@ -34,7 +35,7 @@ namespace PetriNets
 		protected override void OnMouseDown(MouseEventArgs e)
 		{
 			for (var i = Shapes.Count - 1; i >= 0; i--)
-				if (Shapes[i].HitTest(e.Location)) { selectedShape = Shapes[i];; break; }
+				if (Shapes[i].HitTest(e.Location)) { selectedShape = Shapes[i]; break; }
 			if (selectedShape != null) { moving = true; previousPoint = e.Location; }
 			if(selectedShape != null)
 			{
@@ -113,7 +114,7 @@ namespace PetriNets
 
 		void DrawCircle(Point Location)
 		{
-			Circle circle = new Circle(Location, 20);
+			Circle circle = new Circle(Location, 20, "P"+unicalLabelId++);
 			Shapes.Add(circle);
 			Graphics g = this.CreateGraphics();
 			circle.Draw(g);
@@ -129,7 +130,7 @@ namespace PetriNets
 
 		void DrawRectangle(Point Location)
 		{
-			TRectangle rectangle = new TRectangle(Location, 50, 20);
+			TRectangle rectangle = new TRectangle(Location, 50, 20, "t" + unicalLabelId++);
 			Shapes.Add(rectangle);
 			Graphics g = this.CreateGraphics();
 			rectangle.Draw(g);
@@ -155,16 +156,32 @@ namespace PetriNets
 			isDeliting = true;
 			this.Cursor = Cursors.Cross;
 		}
+
+		private void Form1_DoubleClick(object sender, EventArgs e)
+		{
+			var location = ((MouseEventArgs)e).Location;
+			for (var i = Shapes.Count - 1; i >= 0; i--)
+				if (Shapes[i].HitTest(location)) { selectedShape = Shapes[i]; break; }
+			if (selectedShape != null)
+			{
+				EditLabelName editLabel = new EditLabelName();
+				editLabel.ShowDialog();
+				if(editLabel.currentName != "")
+					selectedShape.RenameLabel(editLabel.currentName);
+			}
+		}
 	}
 
 	public class Circle : IShape
 	{
-		public Circle(Point _Center, int _Radious)
+		public Circle(Point _Center, int _Radious, string labelText)
 		{
 			FillColor = ControlPaint.Light(Color.Red);
 			Center = _Center;
 			Radious = _Radious;
+			label = new Label(new Point(_Center.X + 15, _Center.Y+15),labelText);
 		}
+		public Label label { get; set; }
 		public Color FillColor { get; set; }
 		public Point Center { get; set; }
 		public int Radious { get; set; }
@@ -182,29 +199,38 @@ namespace PetriNets
 			var result = false;
 			using (var path = GetPath())
 				result = path.IsVisible(p);
-			return result;
+			return result || label.HitTest(p);
 		}
 		public void Draw(Graphics g)
 		{
 			using (var path = GetPath())
 			using (var brush = new SolidBrush(FillColor))
 				g.FillPath(brush, path);
+			label.Draw(g);
 		}
 		public void Move(Point d)
 		{
 			Center = new Point(Center.X + d.X, Center.Y + d.Y);
+			label.Move(d);
+		}
+
+		public void RenameLabel(string newName)
+		{
+			this.label.Text = newName;
 		}
 	}
 
 	public class TRectangle : IShape
 	{
-		public TRectangle(Point _Center, int _height, int _width)
+		public TRectangle(Point _Center, int _height, int _width, string labelText)
 		{
 			FillColor = ControlPaint.Light(Color.DarkBlue);
 			Center = _Center;
 			height = _height;
 			width = _width;
+			label = new Label(new Point(_Center.X + width + 10, _Center.Y + height + 10), labelText);
 		}
+		public Label label { get; set; }
 		public Color FillColor { get; set; }
 		public Point Center { get; set; }
 		public int height { get; set; }
@@ -223,17 +249,23 @@ namespace PetriNets
 			var result = false;
 			using (var path = GetPath())
 				result = path.IsVisible(p);
-			return result;
+			return result || label.HitTest(p);
 		}
 		public void Draw(Graphics g)
 		{
 			using (var path = GetPath())
 			using (var brush = new SolidBrush(FillColor))
 				g.FillPath(brush, path);
+			label.Draw(g);
 		}
 		public void Move(Point d)
 		{
 			Center = new Point(Center.X + d.X, Center.Y + d.Y);
+			label.Move(d);
+		}
+		public void RenameLabel(string newName)
+		{
+			this.label.Text = newName;
 		}
 	}
 
@@ -269,6 +301,43 @@ namespace PetriNets
 			Point1 = new Point(Point1.X + d.X, Point1.Y + d.Y);
 			Point2 = new Point(Point2.X + d.X, Point2.Y + d.Y);
 		}
+
+		public void RenameLabel(string newName)
+		{
+			
+		}
+	}
+
+	public class Label
+	{
+		public Label(Point location, string text) {Location = location;Text = text; FF = new FontFamily("Arial"); }
+		public Point Location{ get; set; }
+		public string Text { get; set; }
+		private FontFamily FF;
+		public GraphicsPath GetPath()
+		{
+			var path = new GraphicsPath();
+			path.AddString(Text, FF, (int)FontStyle.Regular, 12, Location, StringFormat.GenericDefault);
+			return path;
+		}
+		public bool HitTest(Point p)
+		{
+			var result = false;
+			using (var path = GetPath())
+			using (var pen = new Pen(Color.Black, 4))
+				result = path.IsOutlineVisible(p, pen);
+			return result;
+		}
+		public void Draw(Graphics g)
+		{
+			using (var path = GetPath())
+			using (var pen = new Pen(Color.Black, 2))
+				g.DrawPath(pen, path);
+		}
+		public void Move(Point d)
+		{
+			Location = new Point(Location.X + d.X, Location.Y + d.Y);
+		}
 	}
 
 	public interface IShape
@@ -277,10 +346,12 @@ namespace PetriNets
 		bool HitTest(Point p);
 		void Draw(Graphics g);
 		void Move(Point d);
+		void RenameLabel(string newName);
 	}
 
 	public abstract class Shape
 	{
 		public Color FillColor { get; set; }
+		public Label label { get; set; }
 	}
 }
