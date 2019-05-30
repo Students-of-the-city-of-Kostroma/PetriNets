@@ -38,9 +38,10 @@ namespace PetriNets
 
 		protected override void OnMouseDown(MouseEventArgs e)
 		{
+			
 			for (var i = Shapes.Count - 1; i >= 0; i--)
 				if (Shapes[i].HitTest(e.Location)) { if (!(Shapes[i] is Line)) { selectedShape = Shapes[i]; break; } }
-			if (selectedShape != null) { moving = true; previousPoint = e.Location; selectedShape.ChangeColor(); }
+			if (selectedShape != null) { moving = true; previousPoint = e.Location; selectedShape.ChangeColor(); } 
 			base.OnMouseDown(e);
 		}
 
@@ -96,11 +97,12 @@ namespace PetriNets
 			{
 				DrawElement(location);
 			}
-			if(isLinening && resize)
+			if (isLinening && resize)
 			{
 				curLine.points.Add(location);
 				if (selectedShape != null)
 				{
+
 					resize = false;
 					if (!isValidArch(startShape, selectedShape))
 					{
@@ -108,8 +110,8 @@ namespace PetriNets
 						(startShape as INotArch).getLines().Remove(curLine);
 					}
 					(selectedShape as INotArch).getLines().Add(curLine);
-					curLine.points.RemoveAt(curLine.points.Count-1);
-					curLine.points.Add(selectedShape.getCenter());
+					var p = selectedShape.getCenter();					
+					curLine.endShape = selectedShape;
 					selectedShape.ChangeColor();
 					selectedShape = null;
 				}
@@ -127,7 +129,7 @@ namespace PetriNets
 				resize = true;
 				startShape = selectedShape;
 				selectedShape.ChangeColor();
-				(startShape as INotArch).makeObjectStartInLine();
+				curLine.startShape = selectedShape;
 				(startShape as INotArch).getLines().Add(line);
 				selectedShape = null;
 			}
@@ -136,7 +138,7 @@ namespace PetriNets
 		private bool isValidArch(IShape startShape, IShape endShape)
 		{
 			if (startShape is Circle) { if (endShape is TRectangle) { return true; } }
-			if(startShape is TRectangle) { if (endShape is Circle) { return true; } }
+			if (startShape is TRectangle) { if (endShape is Circle) { return true; } }
 			return false;
 		}
 
@@ -150,7 +152,7 @@ namespace PetriNets
 
 		void DrawCircle(Point Location)
 		{
-			Circle circle = new Circle(Location, 20, "P"+unicalLabelId++);
+			Circle circle = new Circle(Location, 20, "P" + unicalLabelId++);
 			Shapes.Add(circle);
 			Graphics g = this.CreateGraphics();
 			circle.Draw(g);
@@ -207,10 +209,10 @@ namespace PetriNets
 			{
 				EditLabelName editLabel = new EditLabelName();
 				editLabel.ShowDialog();
-				if(editLabel.currentName != "")
+				if (editLabel.currentName != "")
 					selectedShape.RenameLabel(editLabel.currentName);
 			}
-			
+
 		}
 
 		private void line_MouseMove(object sender, MouseEventArgs e)
@@ -234,10 +236,10 @@ namespace PetriNets
 			FillColor = ControlPaint.Light(Color.Red);
 			Center = _Center;
 			Radious = _Radious;
-			label = new Label(new Point(_Center.X + 15, _Center.Y+15),labelText);
+			label = new Label(new Point(_Center.X + 15, _Center.Y + 15), labelText);
 			inLines = new List<Line>();
 		}
-		public List<Line> inLines { get; set; } 
+		public List<Line> inLines { get; set; }
 		public Label label { get; set; }
 		public Color FillColor { get; set; }
 		public Point Center { get; set; }
@@ -271,8 +273,8 @@ namespace PetriNets
 			label.Move(d);
 			foreach (Line line in inLines)
 			{
-				if (isStart) { line.ResizeStart(d); }
-				else { line.Resize(d); }	
+				if (line.startShape == this) { line.ResizeStart(d); }
+				else { line.Resize(d); }
 			}
 		}
 
@@ -287,18 +289,12 @@ namespace PetriNets
 			else
 				FillColor = DefaultColor;
 		}
-		public PointF getCenter()
-		{
+		public PointF getCenter() {
 			return (PointF)Center;
 		}
-		public List<Line> getLines()
-		{
-			return inLines;
-		}
-		public void makeObjectStartInLine()
-		{
-			isStart = true;
-		}
+
+		public List<Line> getLines() { return inLines; }
+
 	}
 
 	public class TRectangle : IShape, INotArch
@@ -313,7 +309,7 @@ namespace PetriNets
 			Center = _Center;
 			height = _height;
 			width = _width;
-			label = new Label(new Point(_Center.X+10, _Center.Y +10), labelText);
+			label = new Label(new Point(_Center.X + 10, _Center.Y + 10), labelText);
 			inLines = new List<Line>();
 		}
 		public List<Line> inLines { get; set; }
@@ -326,7 +322,7 @@ namespace PetriNets
 		{
 			var path = new GraphicsPath();
 			var p = Center;
-			p.Offset(-width/2, -height/2);
+			p.Offset(-width / 2, -height / 2);
 			path.AddRectangle(new Rectangle(p.X, p.Y, width, height));
 			return path;
 		}
@@ -351,7 +347,7 @@ namespace PetriNets
 			label.Move(d);
 			foreach (Line line in inLines)
 			{
-				if (isStart) { line.ResizeStart(d); }
+				if (line.startShape == this) { line.ResizeStart(d); }
 				else { line.Resize(d); }
 			}
 		}
@@ -366,29 +362,22 @@ namespace PetriNets
 			else
 				FillColor = DefaultColor;
 		}
-		public PointF getCenter()
-		{
-			var p = Center;
-			return (PointF)p;
-		}
+		public PointF getCenter() { return (PointF)Center; }
 
-		public List<Line> getLines()
-		{
-			return inLines;
-		}
+		public List<Line> getLines() { return inLines; }
 
-		public void makeObjectStartInLine()
-		{
-			isStart = true;
-		}
+
 	}
 
 	public class Line : IShape
 	{
 		public Line() { LineWidth = 2; LineColor = Color.Black; points = new List<PointF>(); }
+		Font font = new Font(new FontFamily("Arial"),12,FontStyle.Regular,GraphicsUnit.Pixel);
+		public IShape startShape { get; set; }
+		public IShape endShape { get; set; }
 		public int LineWidth { get; set; }
 		public Color LineColor { get; set; }
-		public List<PointF> points {get; set;}
+		public List<PointF> points { get; set; }
 		public GraphicsPath GetPath()
 		{
 			var path = new GraphicsPath();
@@ -405,9 +394,13 @@ namespace PetriNets
 		}
 		public void Draw(Graphics g)
 		{
+			var pen = new Pen(LineColor, LineWidth + 2);
+			pen.EndCap = LineCap.ArrowAnchor;
 			using (var path = GetPath())
-			using (var pen = new Pen(LineColor, LineWidth))
+			{
 				g.DrawPath(pen, path);
+				g.DrawString("in", font, Brushes.Black, points[points.Count-1].X - 20 , points[points.Count - 1].Y - 20);
+			}
 		}
 		public void Move(Point d)
 		{
@@ -415,7 +408,7 @@ namespace PetriNets
 
 		public void Resize(Point d)
 		{
-			points[points.Count-1] = new PointF(points[points.Count-1].X + d.X, points[points.Count-1].Y + d.Y);
+			points[points.Count - 1] = new PointF(points[points.Count - 1].X + d.X, points[points.Count - 1].Y + d.Y);
 		}
 
 		public void ResizeStart(Point d)
@@ -423,27 +416,20 @@ namespace PetriNets
 			points[0] = new PointF(points[0].X + d.X, points[0].Y + d.Y);
 		}
 
-		public void RenameLabel(string newName)
-		{
-			
-		}
+		public void RenameLabel(string newName) { }
 
-		public void ChangeColor()
-		{
+		public void ChangeColor() { }
 
-		}
+		public PointF getCenter() { return PointF.Empty; }
 
-		public PointF getCenter()
-		{
-			return PointF.Empty;
-		}
+		public PointF getEdge(Point curLocation) { return PointF.Empty; }
 
 	}
 
 	public class Label
 	{
-		public Label(Point location, string text) {Location = location;Text = text; FF = new FontFamily("Arial"); }
-		public Point Location{ get; set; }
+		public Label(Point location, string text) { Location = location; Text = text; FF = new FontFamily("Arial"); }
+		public Point Location { get; set; }
 		public string Text { get; set; }
 		private FontFamily FF;
 		public GraphicsPath GetPath()
@@ -470,7 +456,7 @@ namespace PetriNets
 		{
 			Location = new Point(Location.X + d.X, Location.Y + d.Y);
 		}
-	}
+	}		
 
 	public interface IShape
 	{
@@ -486,7 +472,6 @@ namespace PetriNets
 	public interface INotArch
 	{
 		List<Line> getLines();
-		void makeObjectStartInLine();
 	}
 
 	public abstract class Shape
