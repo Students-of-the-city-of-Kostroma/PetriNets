@@ -21,5 +21,6 @@ namespace PetriNetsClassLibrary
 		{
 			_allPlaces = new List<MPlace>();
 		}
+
 	}
 }

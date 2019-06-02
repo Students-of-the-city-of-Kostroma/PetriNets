@@ -27,5 +27,10 @@ namespace PetriNetsClassLibrary
 			if(arc.edge.isInEdge) { return mTransition.addArc(arc, mTransition.inPlaces); }
 			else { return mTransition.addArc(arc, mTransition.outPlaces); }
 		}
+
+		public void removeLink(MArc arc, List<MArc> arcs)
+		{
+			arcs.Remove(arc);
+		}
 	}
 }
