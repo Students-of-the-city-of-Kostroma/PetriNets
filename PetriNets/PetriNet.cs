@@ -254,10 +254,11 @@ namespace PetriNets
 			hitTest(location);
 			if (selectedShape != null)
 			{
-				selectedShape.ChangeColor();
-				this.Refresh();
-				MessageBox.Show("Вы действительно хотите удалить этот объект");
-				selectedShape.ChangeColor();
+				this.Invalidate();
+				if (DialogResult.Yes == MessageBox.Show("Вы хотите удалить этот объект?", "Удаление объекта", MessageBoxButtons.YesNo))
+				{
+					selectedShape.delete(Shapes);
+				}
 			}
 		}
 
@@ -337,6 +338,32 @@ namespace PetriNets
 
 		public List<Line> getLines() { return inLines; }
 
+		public void delete(List<IShape> shapes)
+		{
+			shapes.Remove(this);
+			foreach(var line in inLines)
+			{
+				TRectangle rectangle; 
+				if(line.startShape is TRectangle)
+				{
+					rectangle = line.startShape as TRectangle;
+					deleteReference(line.mArc, rectangle.model.inPlaces);
+				}
+				else
+				{
+					rectangle = line.endShape as TRectangle;
+					deleteReference(line.mArc, rectangle.model.outPlaces);
+				}
+				rectangle.inLines.Remove(line);
+				shapes.Remove(line);
+			}
+		}
+
+		private void deleteReference(MArc arc, List<MArc> arcs)
+		{
+			PetriNetsClassLibrary.PetriNet.CTransition.removeLink(arc, arcs);
+		}
+
 	}
 
 	public class TRectangle : IShape, INotArch
@@ -409,7 +436,24 @@ namespace PetriNets
 
 		public List<Line> getLines() { return inLines; }
 
-
+		public void delete(List<IShape> shapes)
+		{
+			shapes.Remove(this);
+			foreach (var line in inLines)
+			{
+				Circle circle;
+				if (line.startShape is Circle)
+				{
+					circle = line.startShape as Circle;
+				}
+				else
+				{
+					circle = line.endShape as Circle;
+				}
+				circle.inLines.Remove(line);
+				shapes.Remove(line);
+			}
+		}
 	}
 
 	public class Line : IShape
@@ -422,6 +466,7 @@ namespace PetriNets
 		public Color LineColor { get; set; }
 		public List<PointF> points { get; set; }
 		public MArc mArc;
+		public Edge edge;
 		public GraphicsPath GetPath()
 		{
 			var path = new GraphicsPath();
@@ -444,7 +489,7 @@ namespace PetriNets
 			{
 				g.DrawPath(pen, path);
 				g.DrawString("in", font, Brushes.Brown, points[points.Count-1].X - 40 , points[points.Count - 1].Y - 20);
-				g.DrawString("[1]", font, Brushes.Brown, points[(points.Count - 1)/2].X, points[(points.Count - 1) / 2].Y + 20);
+				g.DrawString(String.Format("[{0}]", mArc.weight), font, Brushes.Brown, points[(points.Count - 1)/2].X, points[(points.Count - 1) / 2].Y + 20);
 			}
 		}
 		public void Move(Point d)
@@ -468,6 +513,16 @@ namespace PetriNets
 		public PointF getCenter() { return PointF.Empty; }
 
 		public PointF getEdge(Point curLocation) { return PointF.Empty; }
+
+		public void delete(List<IShape> shapes)
+		{
+			Circle circle;
+			TRectangle rectangle;
+			if(this.startShape is Circle) { circle = (Circle)this.startShape; rectangle = (TRectangle)this.endShape; }
+			else { circle = (Circle)this.endShape; rectangle = (TRectangle)this.startShape; }
+			circle.inLines.Remove(this);
+			rectangle.inLines.Remove(this);
+		}
 
 	}
 
@@ -512,6 +567,7 @@ namespace PetriNets
 		void RenameLabel(string newName);
 		void ChangeColor();
 		PointF getCenter();
+		void delete(List<IShape> shapes);
 	}
 
 	public interface INotArch
