@@ -8,6 +8,10 @@ namespace PetriNetsClassLibrary
 {
 	public class MArc : Model
 	{
+		public MArc()
+		{
+			weight = 1;
+		}
 		public uint weight
 		{
 			get;set;

@@ -153,7 +153,6 @@
 			this.line.Size = new System.Drawing.Size(23, 22);
 			this.line.Text = "toolStripButton3";
 			this.line.Click += new System.EventHandler(this.line_Click);
-			this.line.MouseMove += new System.Windows.Forms.MouseEventHandler(this.line_MouseMove);
 			// 
 			// toolStripButton1
 			// 

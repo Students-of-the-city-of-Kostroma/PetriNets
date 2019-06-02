@@ -8,8 +8,8 @@ namespace PetriNetsClassLibrary
 {
 	public class MTransition : Model
 	{
-		List<MArc> inPlaces;
-		List<MArc> outPlaces;
+		public List<MArc> inPlaces { get; } = new List<MArc>();
+		public List<MArc> outPlaces { get; } = new List<MArc>();
 		bool isEnable;
 
 		public string label
@@ -22,6 +22,18 @@ namespace PetriNetsClassLibrary
 			isEnable = false;
 			label = _label;
 		}
+
+		public bool addArc(MArc arc, List<MArc> places)
+		{
+			foreach(var place in places)
+			{
+				if(place.edge.edge.Item1.label == arc.edge.edge.Item1.label)
+					if(place.edge.edge.Item2.label == arc.edge.edge.Item2.label) { return false; }
+			}
+			places.Add(arc);
+			return true;
+		}
+
 
 	}
 }

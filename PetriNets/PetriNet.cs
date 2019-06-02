@@ -34,14 +34,14 @@ namespace PetriNets
 		Line curLine;
 		bool resize;
 		IShape startShape;
-		IShape endShape;
 
+
+		#region onMouse methods
 		protected override void OnMouseDown(MouseEventArgs e)
 		{
-			
-			for (var i = Shapes.Count - 1; i >= 0; i--)
-				if (Shapes[i].HitTest(e.Location)) { if (!(Shapes[i] is Line)) { selectedShape = Shapes[i]; break; } }
-			if (selectedShape != null) { moving = true; previousPoint = e.Location; selectedShape.ChangeColor(); } 
+
+			hitTest(e.Location);
+			if (selectedShape != null) { moving = true; previousPoint = e.Location; selectedShape.ChangeColor(); }
 			base.OnMouseDown(e);
 		}
 
@@ -76,72 +76,9 @@ namespace PetriNets
 			foreach (var shape in Shapes)
 				shape.Draw(e.Graphics);
 		}
+		#endregion
 
-
-
-		private void CanvasClick(object sender, EventArgs e)
-		{
-			if (((MouseEventArgs)e).Button == MouseButtons.Right) { Shapes.Remove(curLine); }
-			var location = ((MouseEventArgs)e).Location;
-			if (isDeliting)
-			{
-				if (selectedShape != null)
-				{
-					selectedShape.ChangeColor();
-					this.Refresh();
-					MessageBox.Show("Вы действительно хотите удалить этот объект");
-					selectedShape.ChangeColor();
-				}
-			}
-			if (DrawElement != null)
-			{
-				DrawElement(location);
-			}
-			if (isLinening && resize)
-			{
-				curLine.points.Add(location);
-				if (selectedShape != null)
-				{
-
-					resize = false;
-					if (!isValidArch(startShape, selectedShape))
-					{
-						Shapes.Remove(curLine);
-						(startShape as INotArch).getLines().Remove(curLine);
-					}
-					(selectedShape as INotArch).getLines().Add(curLine);
-					var p = selectedShape.getCenter();					
-					curLine.endShape = selectedShape;
-					selectedShape.ChangeColor();
-					selectedShape = null;
-				}
-				this.Invalidate();
-			}
-			if (isLinening && !resize && selectedShape != null)
-			{
-				Line line = new Line();
-				line.points.Add(selectedShape.getCenter());
-				line.points.Add(new PointF(selectedShape.getCenter().X + 1, selectedShape.getCenter().Y + 1));
-				Shapes.Insert(0, line);
-				line.Draw(this.CreateGraphics());
-				curLine = line;
-				previousPoint = location;
-				resize = true;
-				startShape = selectedShape;
-				selectedShape.ChangeColor();
-				curLine.startShape = selectedShape;
-				(startShape as INotArch).getLines().Add(line);
-				selectedShape = null;
-			}
-		}
-
-		private bool isValidArch(IShape startShape, IShape endShape)
-		{
-			if (startShape is Circle) { if (endShape is TRectangle) { return true; } }
-			if (startShape is TRectangle) { if (endShape is Circle) { return true; } }
-			return false;
-		}
-
+		#region click methods
 		private void circle_Click(object sender, EventArgs e)
 		{
 			DrawElement = DrawCircle;
@@ -150,13 +87,26 @@ namespace PetriNets
 			this.Cursor = Cursors.Arrow;
 		}
 
-		void DrawCircle(Point Location)
+		private void CanvasClick(object sender, EventArgs e)
 		{
-			Circle circle = new Circle(Location, 20, "P" + unicalLabelId++);
-			Shapes.Add(circle);
-			Graphics g = this.CreateGraphics();
-			circle.Draw(g);
-			g.Dispose();
+			if (((MouseEventArgs)e).Button == MouseButtons.Right) { Shapes.Remove(curLine); }
+			var location = ((MouseEventArgs)e).Location;
+			if (isDeliting)
+			{
+				deleteElement(location);
+			}
+			if (DrawElement != null)
+			{
+				DrawElement(location);
+			}
+			if (isLinening && resize)
+			{
+				resizingLine(location);
+			}
+			if (isLinening && !resize && selectedShape != null)
+			{
+				createNewLine(location);
+			}
 		}
 
 		private void rectangle_Click(object sender, EventArgs e)
@@ -167,14 +117,6 @@ namespace PetriNets
 			this.Cursor = Cursors.Arrow;
 		}
 
-		void DrawRectangle(Point Location)
-		{
-			TRectangle rectangle = new TRectangle(Location, 50, 20, "t" + unicalLabelId++);
-			Shapes.Add(rectangle);
-			Graphics g = this.CreateGraphics();
-			rectangle.Draw(g);
-			g.Dispose();
-		}
 
 		private void line_Click(object sender, EventArgs e)
 		{
@@ -214,14 +156,113 @@ namespace PetriNets
 			}
 
 		}
+		#endregion
 
-		private void line_MouseMove(object sender, MouseEventArgs e)
+		#region drawing methods
+		void DrawCircle(Point Location)
 		{
+			Circle circle = new Circle(Location, 20, "P" + unicalLabelId++);
+			Shapes.Add(circle);
+			Graphics g = this.CreateGraphics();
+			circle.Draw(g);
+			g.Dispose();
 		}
+
+		void DrawRectangle(Point Location)
+		{
+			TRectangle rectangle = new TRectangle(Location, 50, 20, "t" + unicalLabelId++);
+			Shapes.Add(rectangle);
+			Graphics g = this.CreateGraphics();
+			rectangle.Draw(g);
+			g.Dispose();
+		}
+		#endregion
+
+		#region private methods 
+		private void createNewLine(Point location)
+		{
+			Line line = new Line();
+			line.points.Add(selectedShape.getCenter());
+			line.points.Add(new PointF(selectedShape.getCenter().X + 1, selectedShape.getCenter().Y + 1));
+			Shapes.Insert(0, line);
+			line.Draw(this.CreateGraphics());
+			curLine = line;
+			previousPoint = location;
+			resize = true;
+			startShape = selectedShape;
+			selectedShape.ChangeColor();
+			curLine.startShape = selectedShape;
+			(startShape as INotArch).getLines().Add(line);
+			selectedShape = null;
+		}
+
+		private bool isValidArch(IShape startShape, IShape endShape)
+		{
+			if (startShape is Circle) { if (endShape is TRectangle) { return true; } }
+			if (startShape is TRectangle) { if (endShape is Circle) { return true; } }
+			return false;
+		}
+		private void hitTest(Point location)
+		{
+			for (var i = Shapes.Count - 1; i >= 0; i--)
+				if (Shapes[i].HitTest(location)) { if (!(Shapes[i] is Line)) { selectedShape = Shapes[i]; break; } }
+		}
+
+		private void resizingLine(Point location)
+		{
+			curLine.points.Add(location);
+			if (selectedShape != null)
+			{
+
+				resize = false;
+				curLine.endShape = selectedShape;
+				if (!isValidArch(startShape, selectedShape) | !addTransition(curLine))
+				{
+					Shapes.Remove(curLine);
+					(startShape as INotArch).getLines().Remove(curLine);
+				}
+				(selectedShape as INotArch).getLines().Add(curLine);
+				selectedShape.ChangeColor();
+				selectedShape = null;
+			}
+			this.Invalidate();
+		}
+
+		private Edge createEdge(Line line)
+		{
+			MTransition mTransition;
+			MPlace mPlace;
+			bool status;
+			if(line.startShape is Circle) { mPlace = (line.startShape as Circle).model;
+				mTransition = (line.endShape as TRectangle).model; status = true; }
+			else { mPlace = (line.endShape as Circle).model;
+				mTransition = (line.startShape as TRectangle).model; status = false; }
+			return new Edge(mPlace, mTransition, status);
+		}
+
+		private bool addTransition(Line line)
+		{
+			MTransition mTransition;
+			if (line.startShape is Circle) {mTransition = (line.endShape as TRectangle).model; }
+			else {mTransition = (line.startShape as TRectangle).model;}
+			line.mArc.edge = createEdge(line);
+			return PetriNetsClassLibrary.PetriNet.CTransition.addArc(mTransition, line.mArc);
+		}
+
+		private void deleteElement(Point location)
+		{
+			hitTest(location);
+			if (selectedShape != null)
+			{
+				selectedShape.ChangeColor();
+				this.Refresh();
+				MessageBox.Show("Вы действительно хотите удалить этот объект");
+				selectedShape.ChangeColor();
+			}
+		}
+
+		#endregion
 	}
-
-
-
 
 
 
@@ -229,7 +270,6 @@ namespace PetriNets
 	{
 		private Color DefaultColor = ControlPaint.Light(Color.Red);
 		private Color SelectedColor = Color.Green;
-		private bool isStart = false;
 
 		public Circle(Point _Center, int _Radious, string labelText)
 		{
@@ -238,7 +278,9 @@ namespace PetriNets
 			Radious = _Radious;
 			label = new Label(new Point(_Center.X + 15, _Center.Y + 15), labelText);
 			inLines = new List<Line>();
+			model = new MPlace(labelText);
 		}
+		public MPlace model;
 		public List<Line> inLines { get; set; }
 		public Label label { get; set; }
 		public Color FillColor { get; set; }
@@ -301,7 +343,6 @@ namespace PetriNets
 	{
 		private Color DefaultColor = ControlPaint.Light(Color.DarkBlue);
 		private Color SelectedColor = Color.Green;
-		private bool isStart = false;
 
 		public TRectangle(Point _Center, int _height, int _width, string labelText)
 		{
@@ -311,7 +352,9 @@ namespace PetriNets
 			width = _width;
 			label = new Label(new Point(_Center.X + 10, _Center.Y + 10), labelText);
 			inLines = new List<Line>();
+			model = new MTransition(labelText);
 		}
+		public MTransition model;
 		public List<Line> inLines { get; set; }
 		public Label label { get; set; }
 		public Color FillColor { get; set; }
@@ -371,13 +414,14 @@ namespace PetriNets
 
 	public class Line : IShape
 	{
-		public Line() { LineWidth = 2; LineColor = Color.Black; points = new List<PointF>(); }
+		public Line() { LineWidth = 2; LineColor = Color.Black; points = new List<PointF>(); mArc = new MArc(); }
 		Font font = new Font(new FontFamily("Arial"),12,FontStyle.Regular,GraphicsUnit.Pixel);
 		public IShape startShape { get; set; }
 		public IShape endShape { get; set; }
 		public int LineWidth { get; set; }
 		public Color LineColor { get; set; }
 		public List<PointF> points { get; set; }
+		public MArc mArc;
 		public GraphicsPath GetPath()
 		{
 			var path = new GraphicsPath();
@@ -399,7 +443,8 @@ namespace PetriNets
 			using (var path = GetPath())
 			{
 				g.DrawPath(pen, path);
-				g.DrawString("in", font, Brushes.Black, points[points.Count-1].X - 20 , points[points.Count - 1].Y - 20);
+				g.DrawString("in", font, Brushes.Brown, points[points.Count-1].X - 40 , points[points.Count - 1].Y - 20);
+				g.DrawString("[1]", font, Brushes.Brown, points[(points.Count - 1)/2].X, points[(points.Count - 1) / 2].Y + 20);
 			}
 		}
 		public void Move(Point d)

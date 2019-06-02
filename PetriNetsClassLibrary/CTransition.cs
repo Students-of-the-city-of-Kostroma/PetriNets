@@ -21,5 +21,11 @@ namespace PetriNetsClassLibrary
 		{
 			_allTransition = new List<MTransition>();
 		}
+
+		public bool addArc(MTransition mTransition, MArc arc)
+		{
+			if(arc.edge.isInEdge) { return mTransition.addArc(arc, mTransition.inPlaces); }
+			else { return mTransition.addArc(arc, mTransition.outPlaces); }
+		}
 	}
 }
