@@ -134,5 +134,11 @@
   <ItemGroup>
     <None Include="Resources\cross.png" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\computer-icons-icon-design-iconfinder-save-icon.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\36792-3-folders-file.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

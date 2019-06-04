@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace PetriNetsClassLibrary
 {
+	[Serializable]
 	public class MTransition : Model
 	{
 		public List<MArc> inPlaces { get; } = new List<MArc>();
