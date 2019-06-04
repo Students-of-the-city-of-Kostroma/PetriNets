@@ -34,17 +34,17 @@
 			this.bindingNavigatorSeparator2 = new System.Windows.Forms.ToolStripSeparator();
 			this.tbEdit = new System.Windows.Forms.ToolStripMenuItem();
 			this.cmPlace = new System.Windows.Forms.ContextMenuStrip(this.components);
+			this.editNumberOfTokens = new System.Windows.Forms.ToolStripMenuItem();
+			this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+			this.tsmDeletePlace = new System.Windows.Forms.ToolStripMenuItem();
 			this.cmArc = new System.Windows.Forms.ContextMenuStrip(this.components);
-			this.cmTransition = new System.Windows.Forms.ContextMenuStrip(this.components);
-			this.miEditTransition = new System.Windows.Forms.ToolStripMenuItem();
-			this.tsmDeleteTransition = new System.Windows.Forms.ToolStripMenuItem();
 			this.tsmEditWeight = new System.Windows.Forms.ToolStripMenuItem();
 			this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
 			this.tsmDeleteArc = new System.Windows.Forms.ToolStripMenuItem();
+			this.cmTransition = new System.Windows.Forms.ContextMenuStrip(this.components);
+			this.miEditTransition = new System.Windows.Forms.ToolStripMenuItem();
 			this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
-			this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
-			this.tsmDeletePlace = new System.Windows.Forms.ToolStripMenuItem();
-			this.editNumberOfTokens = new System.Windows.Forms.ToolStripMenuItem();
+			this.tsmDeleteTransition = new System.Windows.Forms.ToolStripMenuItem();
 			this.bindingNavigatorMoveFirstItem = new System.Windows.Forms.ToolStripButton();
 			this.bindingNavigatorMoveNextItem = new System.Windows.Forms.ToolStripButton();
 			this.pause = new System.Windows.Forms.ToolStripButton();
@@ -55,6 +55,9 @@
 			this.line = new System.Windows.Forms.ToolStripButton();
 			this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
 			this.toolStripButton2 = new System.Windows.Forms.ToolStripButton();
+			this.Save = new System.Windows.Forms.ToolStripButton();
+			this.Open = new System.Windows.Forms.ToolStripButton();
+			this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
 			((System.ComponentModel.ISupportInitialize)(this.bindingNavigator1)).BeginInit();
 			this.bindingNavigator1.SuspendLayout();
 			this.cmPlace.SuspendLayout();
@@ -78,7 +81,9 @@
             this.rectangle,
             this.line,
             this.toolStripButton1,
-            this.toolStripButton2});
+            this.toolStripButton2,
+            this.Save,
+            this.Open});
 			this.bindingNavigator1.Location = new System.Drawing.Point(0, 0);
 			this.bindingNavigator1.MoveFirstItem = this.bindingNavigatorMoveFirstItem;
 			this.bindingNavigator1.MoveLastItem = this.bindingNavigatorMoveLastItem;
@@ -113,6 +118,25 @@
 			this.cmPlace.RenderMode = System.Windows.Forms.ToolStripRenderMode.Professional;
 			this.cmPlace.Size = new System.Drawing.Size(243, 76);
 			// 
+			// editNumberOfTokens
+			// 
+			this.editNumberOfTokens.Name = "editNumberOfTokens";
+			this.editNumberOfTokens.Size = new System.Drawing.Size(242, 22);
+			this.editNumberOfTokens.Text = "Изменить количество токенов";
+			this.editNumberOfTokens.Click += new System.EventHandler(this.editNumberOfTokens_Click);
+			// 
+			// toolStripSeparator3
+			// 
+			this.toolStripSeparator3.Name = "toolStripSeparator3";
+			this.toolStripSeparator3.Size = new System.Drawing.Size(239, 6);
+			// 
+			// tsmDeletePlace
+			// 
+			this.tsmDeletePlace.Name = "tsmDeletePlace";
+			this.tsmDeletePlace.Size = new System.Drawing.Size(242, 22);
+			this.tsmDeletePlace.Text = "Удалить";
+			this.tsmDeletePlace.Click += new System.EventHandler(this.tsmDelete_Click);
+			// 
 			// cmArc
 			// 
 			this.cmArc.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -121,29 +145,6 @@
             this.tsmDeleteArc});
 			this.cmArc.Name = "cmArc";
 			this.cmArc.Size = new System.Drawing.Size(150, 54);
-			// 
-			// cmTransition
-			// 
-			this.cmTransition.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.miEditTransition,
-            this.toolStripSeparator2,
-            this.tsmDeleteTransition});
-			this.cmTransition.Name = "cmTransition";
-			this.cmTransition.Size = new System.Drawing.Size(182, 76);
-			// 
-			// miEditTransition
-			// 
-			this.miEditTransition.Name = "miEditTransition";
-			this.miEditTransition.Size = new System.Drawing.Size(181, 22);
-			this.miEditTransition.Text = "Изменить название";
-			this.miEditTransition.Click += new System.EventHandler(this.tbEdit_Click);
-			// 
-			// tsmDeleteTransition
-			// 
-			this.tsmDeleteTransition.Name = "tsmDeleteTransition";
-			this.tsmDeleteTransition.Size = new System.Drawing.Size(181, 22);
-			this.tsmDeleteTransition.Text = "Удалить";
-			this.tsmDeleteTransition.Click += new System.EventHandler(this.tsmDelete_Click);
 			// 
 			// tsmEditWeight
 			// 
@@ -164,29 +165,33 @@
 			this.tsmDeleteArc.Text = "Удалить";
 			this.tsmDeleteArc.Click += new System.EventHandler(this.tsmDelete_Click);
 			// 
+			// cmTransition
+			// 
+			this.cmTransition.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.miEditTransition,
+            this.toolStripSeparator2,
+            this.tsmDeleteTransition});
+			this.cmTransition.Name = "cmTransition";
+			this.cmTransition.Size = new System.Drawing.Size(182, 54);
+			// 
+			// miEditTransition
+			// 
+			this.miEditTransition.Name = "miEditTransition";
+			this.miEditTransition.Size = new System.Drawing.Size(181, 22);
+			this.miEditTransition.Text = "Изменить название";
+			this.miEditTransition.Click += new System.EventHandler(this.tbEdit_Click);
+			// 
 			// toolStripSeparator2
 			// 
 			this.toolStripSeparator2.Name = "toolStripSeparator2";
 			this.toolStripSeparator2.Size = new System.Drawing.Size(178, 6);
 			// 
-			// toolStripSeparator3
+			// tsmDeleteTransition
 			// 
-			this.toolStripSeparator3.Name = "toolStripSeparator3";
-			this.toolStripSeparator3.Size = new System.Drawing.Size(239, 6);
-			// 
-			// tsmDeletePlace
-			// 
-			this.tsmDeletePlace.Name = "tsmDeletePlace";
-			this.tsmDeletePlace.Size = new System.Drawing.Size(242, 22);
-			this.tsmDeletePlace.Text = "Удалить";
-			this.tsmDeletePlace.Click += new System.EventHandler(this.tsmDelete_Click);
-			// 
-			// editNumberOfTokens
-			// 
-			this.editNumberOfTokens.Name = "editNumberOfTokens";
-			this.editNumberOfTokens.Size = new System.Drawing.Size(242, 22);
-			this.editNumberOfTokens.Text = "Изменить количество токенов";
-			this.editNumberOfTokens.Click += new System.EventHandler(this.editNumberOfTokens_Click);
+			this.tsmDeleteTransition.Name = "tsmDeleteTransition";
+			this.tsmDeleteTransition.Size = new System.Drawing.Size(181, 22);
+			this.tsmDeleteTransition.Text = "Удалить";
+			this.tsmDeleteTransition.Click += new System.EventHandler(this.tsmDelete_Click);
 			// 
 			// bindingNavigatorMoveFirstItem
 			// 
@@ -283,6 +288,30 @@
 			this.toolStripButton2.Text = "toolStripButton2";
 			this.toolStripButton2.Click += new System.EventHandler(this.toolStripButton2_Click);
 			// 
+			// Save
+			// 
+			this.Save.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.Save.Image = global::PetriNets.Properties.Resources.computer_icons_icon_design_iconfinder_save_icon;
+			this.Save.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.Save.Name = "Save";
+			this.Save.Size = new System.Drawing.Size(23, 22);
+			this.Save.Text = "toolStripButton3";
+			this.Save.Click += new System.EventHandler(this.Save_Click);
+			// 
+			// Open
+			// 
+			this.Open.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.Open.Image = global::PetriNets.Properties.Resources._36792_3_folders_file;
+			this.Open.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.Open.Name = "Open";
+			this.Open.Size = new System.Drawing.Size(23, 22);
+			this.Open.Text = "toolStripButton3";
+			this.Open.Click += new System.EventHandler(this.Open_Click);
+			// 
+			// openFileDialog1
+			// 
+			this.openFileDialog1.FileName = "openFileDialog1";
+			// 
 			// PetriNet
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -332,5 +361,8 @@
 		private System.Windows.Forms.ToolStripMenuItem tsmDeleteArc;
 		private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
 		private System.Windows.Forms.ToolStripMenuItem editNumberOfTokens;
+		private System.Windows.Forms.ToolStripButton Save;
+		private System.Windows.Forms.ToolStripButton Open;
+		private System.Windows.Forms.OpenFileDialog openFileDialog1;
 	}
 }

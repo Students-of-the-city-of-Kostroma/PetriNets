@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace PetriNetsClassLibrary
 {
+	[Serializable]
 	public class Edge
 	{
 		public Edge(MPlace mPlace, MTransition mTransition, bool isInEdge)

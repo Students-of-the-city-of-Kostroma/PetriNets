@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace PetriNetsClassLibrary
 {
+	[Serializable]
 	public class MPlace : Model
 	{
 

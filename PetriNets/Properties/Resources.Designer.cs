@@ -63,6 +63,16 @@ namespace PetriNets.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap _36792_3_folders_file {
+            get {
+                object obj = ResourceManager.GetObject("_36792_3_folders_file", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap circle {
             get {
                 object obj = ResourceManager.GetObject("circle", resourceCulture);
@@ -76,6 +86,16 @@ namespace PetriNets.Properties {
         internal static System.Drawing.Bitmap circle1 {
             get {
                 object obj = ResourceManager.GetObject("circle1", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap computer_icons_icon_design_iconfinder_save_icon {
+            get {
+                object obj = ResourceManager.GetObject("computer_icons_icon_design_iconfinder_save_icon", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

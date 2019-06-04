@@ -4,10 +4,13 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Xml.Serialization;
 using PetriNetsClassLibrary;
 
 namespace PetriNets
@@ -335,14 +338,58 @@ namespace PetriNets
 				(selectedShape as Line).mArc.weight = (uint)edit.numberOfToken;
 			this.Invalidate();
 		}
-	#endregion
+		#endregion
+
+		private void Save_Click(object sender, EventArgs e)
+		{
+			SaveFileDialog saveFileDialog = new SaveFileDialog();
+			saveFileDialog.Filter = "dat файл (*.dat)|*.dat|Все файлы (*.*)|*.*";
+			saveFileDialog.DefaultExt = "*.dat";
+
+			if (saveFileDialog.ShowDialog() == DialogResult.OK)
+			{
+				string FileName = saveFileDialog.FileName;
+				BinaryFormatter binFormat = new BinaryFormatter();
+				using (FileStream fs = new FileStream(FileName, FileMode.OpenOrCreate))
+				{
+					binFormat.Serialize(fs, Shapes);
+					fs.Close();
+				}
+				MessageBox.Show("Файл сохранен");
+			}
+		}
+
+		private void Open_Click(object sender, EventArgs e)
+		{
+			OpenFileDialog op = new OpenFileDialog();
+			op.Filter = "dat файл (*.dat)|*.dat|Все файлы (*.*)|*.*";
+			op.DefaultExt = "*.dat";
+			if (openFileDialog1.ShowDialog() == DialogResult.OK)
+			{
+				Shapes.Clear();
+
+				string FileName = openFileDialog1.FileName;
+				BinaryFormatter binFormat = new BinaryFormatter();
+				using (FileStream fs = new FileStream(FileName, FileMode.OpenOrCreate))
+				{
+					List<IShape> Fig = (List<IShape>)binFormat.Deserialize(fs);
+					foreach (IShape f in Fig)
+					{
+						Shapes.Add(f);
+					}
+					fs.Close();
+				}
+			}
+			Refresh();
+		}
 	}
 
 
-
+	[Serializable]
 	public class Circle : IShape, INotArch
 	{
-		Font font = new Font(new FontFamily("Arial"), 12, FontStyle.Bold, GraphicsUnit.Pixel);
+		SerializableFont font = new SerializableFont("Arial", GraphicsUnit.Pixel, 12, FontStyle.Regular);
+
 		private Color DefaultColor = ControlPaint.Light(Color.Red);
 		private Color SelectedColor = Color.Green;
 		private int TokenRadius = 3;
@@ -451,7 +498,7 @@ namespace PetriNets
 			{
 				var z = Center;
 				z.Offset(-6, -6);
-				g.DrawString(numberOfToken + "", font, Brushes.Black, z);
+				g.DrawString(numberOfToken + "", font.ToFont(), Brushes.Black, z);
 				return;
 			}
 			for (int i = 0; i < numberOfToken; i++) {
@@ -475,6 +522,7 @@ namespace PetriNets
 
 	}
 
+	[Serializable]
 	public class TRectangle : IShape, INotArch
 	{
 		private Color DefaultColor = ControlPaint.Light(Color.DarkBlue);
@@ -565,10 +613,11 @@ namespace PetriNets
 		}
 	}
 
+	[Serializable]
 	public class Line : IShape
 	{
 		public Line() { LineWidth = 2; LineColor = Color.Black; points = new List<PointF>(); mArc = new MArc(); }
-		Font font = new Font(new FontFamily("Arial"),12,FontStyle.Regular,GraphicsUnit.Pixel);
+		SerializableFont font = new SerializableFont("Arial", GraphicsUnit.Pixel, 12, FontStyle.Regular);
 		public IShape startShape { get; set; }
 		public IShape endShape { get; set; }
 		public int LineWidth { get; set; }
@@ -597,8 +646,8 @@ namespace PetriNets
 			using (var path = GetPath())
 			{
 				g.DrawPath(pen, path);
-				g.DrawString("in", font, Brushes.Brown, points[points.Count-1].X - 40 , points[points.Count - 1].Y - 20);
-				g.DrawString(String.Format("[{0}]", mArc.weight), font, Brushes.Brown, points[(points.Count - 1)/2].X, points[(points.Count - 1) / 2].Y + 20);
+				g.DrawString("in", font.ToFont(), Brushes.Brown, points[points.Count-1].X - 40 , points[points.Count - 1].Y - 20);
+				g.DrawString(String.Format("[{0}]", mArc.weight), font.ToFont(), Brushes.Brown, points[(points.Count - 1)/2].X, points[(points.Count - 1) / 2].Y + 20);
 			}
 		}
 		public void Move(Point d)
@@ -636,16 +685,18 @@ namespace PetriNets
 
 	}
 
+	[Serializable]
 	public class Label
 	{
-		public Label(Point location, string text) { Location = location; Text = text; FF = new FontFamily("Arial"); }
+		public Label(Point location, string text) { Location = location; Text = text;  }
 		public Point Location { get; set; }
 		public string Text { get; set; }
+		[NonSerialized]
 		private FontFamily FF;
 		public GraphicsPath GetPath()
 		{
 			var path = new GraphicsPath();
-			path.AddString(Text, FF, (int)FontStyle.Regular, 12, Location, StringFormat.GenericDefault);
+			path.AddString(Text, FF = new FontFamily("Arial"), (int)FontStyle.Regular, 12, Location, StringFormat.GenericDefault);
 			return path;
 		}
 		public bool HitTest(Point p)
@@ -666,8 +717,39 @@ namespace PetriNets
 		{
 			Location = new Point(Location.X + d.X, Location.Y + d.Y);
 		}
-	}		
+	}
 
+	[Serializable]
+	public class SerializableFont
+	{
+		public string FontFamily { get; set; }
+		public GraphicsUnit GraphicsUnit { get; set; }
+		public float Size { get; set; }
+		public FontStyle Style { get; set; }
+
+		/// <summary>
+		/// Intended for xml serialization purposes only
+		/// </summary>
+		private SerializableFont() { }
+
+		public SerializableFont(string fontFamily, GraphicsUnit graphicsUnit, float size, FontStyle style)
+		{
+			FontFamily = fontFamily;
+			GraphicsUnit = graphicsUnit;
+			Size = size;
+			Style = style;
+		}
+
+		public static SerializableFont FromFont(string fontFamily, GraphicsUnit graphicsUnit, float size, FontStyle style)
+		{
+			return new SerializableFont(fontFamily, graphicsUnit, size, style);
+		}
+
+		public Font ToFont()
+		{
+			return new Font(FontFamily, Size, Style, GraphicsUnit);
+		}
+	}
 	public interface IShape
 	{
 		GraphicsPath GetPath();
