@@ -12,6 +12,11 @@ namespace PetriNetsClassLibrary
 		{
 			weight = 1;
 		}
+
+		public MArc(MPlace mPlace, MTransition mTransition, bool isIn)
+		{
+			edge = new Edge(mPlace, mTransition, isIn);
+		}
 		public uint weight
 		{
 			get;set;

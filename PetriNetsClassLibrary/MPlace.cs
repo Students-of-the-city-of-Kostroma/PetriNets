@@ -9,6 +9,8 @@ namespace PetriNetsClassLibrary
 	public class MPlace : Model
 	{
 
+		public MPlace() { }
+
 		public uint tokens
 		{
 			get; set;

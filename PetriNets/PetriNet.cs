@@ -145,8 +145,7 @@ namespace PetriNets
 		private void Form1_DoubleClick(object sender, EventArgs e)
 		{
 			var location = ((MouseEventArgs)e).Location;
-			for (var i = Shapes.Count - 1; i >= 0; i--)
-				if (Shapes[i].HitTest(location)) { selectedShape = Shapes[i]; break; }
+			hitTest(location);
 			if (selectedShape != null)
 			{
 				EditLabelName editLabel = new EditLabelName();
@@ -216,7 +215,7 @@ namespace PetriNets
 
 				resize = false;
 				curLine.endShape = selectedShape;
-				if (!isValidArch(startShape, selectedShape) | !addTransition(curLine))
+				if (!isValidArch(startShape, selectedShape) || !addTransition(curLine))
 				{
 					Shapes.Remove(curLine);
 					(startShape as INotArch).getLines().Remove(curLine);
@@ -224,6 +223,7 @@ namespace PetriNets
 				(selectedShape as INotArch).getLines().Add(curLine);
 				selectedShape.ChangeColor();
 				selectedShape = null;
+				curLine = null;
 			}
 			this.Invalidate();
 		}
@@ -233,7 +233,7 @@ namespace PetriNets
 			MTransition mTransition;
 			MPlace mPlace;
 			bool status;
-			if(line.startShape is Circle) { mPlace = (line.startShape as Circle).model;
+			if (line.startShape is Circle) { mPlace = (line.startShape as Circle).model;
 				mTransition = (line.endShape as TRectangle).model; status = true; }
 			else { mPlace = (line.endShape as Circle).model;
 				mTransition = (line.startShape as TRectangle).model; status = false; }
@@ -243,15 +243,16 @@ namespace PetriNets
 		private bool addTransition(Line line)
 		{
 			MTransition mTransition;
-			if (line.startShape is Circle) {mTransition = (line.endShape as TRectangle).model; }
-			else {mTransition = (line.startShape as TRectangle).model;}
+			if (line.startShape is Circle) { mTransition = (line.endShape as TRectangle).model; }
+			else { mTransition = (line.startShape as TRectangle).model; }
 			line.mArc.edge = createEdge(line);
 			return PetriNetsClassLibrary.PetriNet.CTransition.addArc(mTransition, line.mArc);
 		}
 
 		private void deleteElement(Point location)
 		{
-			hitTest(location);
+			for (var i = Shapes.Count - 1; i >= 0; i--)
+				if (Shapes[i].HitTest(location)) { { selectedShape = Shapes[i]; break; } }
 			if (selectedShape != null)
 			{
 				this.Invalidate();
@@ -269,8 +270,11 @@ namespace PetriNets
 
 	public class Circle : IShape, INotArch
 	{
+		Font font = new Font(new FontFamily("Arial"), 12, FontStyle.Bold, GraphicsUnit.Pixel);
 		private Color DefaultColor = ControlPaint.Light(Color.Red);
 		private Color SelectedColor = Color.Green;
+		private int TokenRadius = 3;
+		private Point[] offsets;
 
 		public Circle(Point _Center, int _Radious, string labelText)
 		{
@@ -280,6 +284,7 @@ namespace PetriNets
 			label = new Label(new Point(_Center.X + 15, _Center.Y + 15), labelText);
 			inLines = new List<Line>();
 			model = new MPlace(labelText);
+			fillOfssets();
 		}
 		public MPlace model;
 		public List<Line> inLines { get; set; }
@@ -287,6 +292,7 @@ namespace PetriNets
 		public Color FillColor { get; set; }
 		public Point Center { get; set; }
 		public int Radious { get; set; }
+		#region select, draw, move
 		public GraphicsPath GetPath()
 		{
 			var path = new GraphicsPath();
@@ -295,7 +301,6 @@ namespace PetriNets
 			path.AddEllipse(p.X, p.Y, 2 * Radious, 2 * Radious);
 			return path;
 		}
-
 		public bool HitTest(Point p)
 		{
 			var result = false;
@@ -309,6 +314,7 @@ namespace PetriNets
 			using (var brush = new SolidBrush(FillColor))
 				g.FillPath(brush, path);
 			label.Draw(g);
+			drawToken(g,(int)model.tokens);
 		}
 		public void Move(Point d)
 		{
@@ -320,7 +326,9 @@ namespace PetriNets
 				else { line.Resize(d); }
 			}
 		}
+		#endregion
 
+		#region IShape other methods
 		public void RenameLabel(string newName)
 		{
 			this.label.Text = newName;
@@ -332,37 +340,66 @@ namespace PetriNets
 			else
 				FillColor = DefaultColor;
 		}
-		public PointF getCenter() {
+		public PointF getCenter()
+		{
 			return (PointF)Center;
 		}
-
 		public List<Line> getLines() { return inLines; }
-
 		public void delete(List<IShape> shapes)
 		{
 			shapes.Remove(this);
-			foreach(var line in inLines)
+			foreach (var line in inLines)
 			{
-				TRectangle rectangle; 
-				if(line.startShape is TRectangle)
+				TRectangle rectangle;
+				if (line.startShape is TRectangle)
 				{
 					rectangle = line.startShape as TRectangle;
 					deleteReference(line.mArc, rectangle.model.inPlaces);
+					rectangle.inLines.Remove(line);
 				}
-				else
+				else if(line.endShape is TRectangle)
 				{
 					rectangle = line.endShape as TRectangle;
 					deleteReference(line.mArc, rectangle.model.outPlaces);
+					rectangle.inLines.Remove(line);
 				}
-				rectangle.inLines.Remove(line);
 				shapes.Remove(line);
 			}
 		}
-
 		private void deleteReference(MArc arc, List<MArc> arcs)
 		{
 			PetriNetsClassLibrary.PetriNet.CTransition.removeLink(arc, arcs);
 		}
+		#endregion
+
+		#region token draw method
+		void drawToken(Graphics g, int numberOfToken)
+		{
+			if (numberOfToken > 5)
+			{
+				var z = Center;
+				z.Offset(-6, -6);
+				g.DrawString(numberOfToken + "", font, Brushes.Black, z);
+				return;
+			}
+			for (int i = 0; i < numberOfToken; i++) {
+				var p = Center;
+				p.Offset(offsets[i]);
+				g.FillEllipse(Brushes.Black, p.X - TokenRadius, p.Y - TokenRadius, TokenRadius * 2, TokenRadius * 2);
+			}
+		}
+
+
+		void fillOfssets()
+		{
+			offsets = new Point[5] {new Point(0, 0),
+									new Point(+Radious - 12, -Radious + 12),
+									new Point(-Radious + 12, +Radious - 12),
+									new Point(Radious - 12, Radious - 12),
+									new Point(-Radious + 12, -Radious + 12)
+		};
+		}
+		#endregion
 
 	}
 
@@ -477,7 +514,7 @@ namespace PetriNets
 		{
 			var result = false;
 			using (var path = GetPath())
-			using (var pen = new Pen(LineColor, LineWidth + 2))
+			using (var pen = new Pen(LineColor, LineWidth + 8))
 				result = path.IsOutlineVisible(p, pen);
 			return result;
 		}
@@ -522,6 +559,7 @@ namespace PetriNets
 			else { circle = (Circle)this.endShape; rectangle = (TRectangle)this.startShape; }
 			circle.inLines.Remove(this);
 			rectangle.inLines.Remove(this);
+			shapes.Remove(this);
 		}
 
 	}
