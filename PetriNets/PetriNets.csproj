@@ -52,11 +52,11 @@
     <Compile Include="EditLabelName.Designer.cs">
       <DependentUpon>EditLabelName.cs</DependentUpon>
     </Compile>
-    <Compile Include="EditNumberOfTokens.cs">
+    <Compile Include="EditNumberOfSomething.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="EditNumberOfTokens.Designer.cs">
-      <DependentUpon>EditNumberOfTokens.cs</DependentUpon>
+    <Compile Include="EditNumberOfSomething.Designer.cs">
+      <DependentUpon>EditNumberOfSomething.cs</DependentUpon>
     </Compile>
     <Compile Include="PetriNet.cs">
       <SubType>Form</SubType>
@@ -69,8 +69,8 @@
     <EmbeddedResource Include="EditLabelName.resx">
       <DependentUpon>EditLabelName.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="EditNumberOfTokens.resx">
-      <DependentUpon>EditNumberOfTokens.cs</DependentUpon>
+    <EmbeddedResource Include="EditNumberOfSomething.resx">
+      <DependentUpon>EditNumberOfSomething.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="PetriNet.resx">
       <DependentUpon>PetriNet.cs</DependentUpon>
