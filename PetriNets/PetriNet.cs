@@ -29,19 +29,23 @@ namespace PetriNets
 			DrawElement = DrawCircle;
 		}
 		IShape selectedShape;
-		IShape selectedForMenuShape;
 		bool moving;
 		Point previousPoint = Point.Empty;
 		Line curLine;
 		bool resize;
 		IShape startShape;
+		bool isContextMenu = false;
 
 
 		#region onMouse methods
 		protected override void OnMouseDown(MouseEventArgs e)
 		{
+			if (((MouseEventArgs)e).Button == MouseButtons.Right)
+			{
+				isContextMenu = true;
+			}
 			hitTest(e.Location);
-			if (selectedShape != null) { moving = true; previousPoint = e.Location; selectedShape.ChangeColor(); }
+			if (selectedShape != null && !isContextMenu) { moving = true; previousPoint = e.Location; selectedShape.ChangeColor(); }
 			base.OnMouseDown(e);
 		}
 
@@ -65,8 +69,9 @@ namespace PetriNets
 		}
 		protected override void OnMouseUp(MouseEventArgs e)
 		{
-			if (selectedShape != null) { selectedShape.ChangeColor(); }
-			if ((moving && DrawElement == null)) { selectedShape = null; moving = false; }
+			if(selectedShape != null && !isContextMenu) { selectedShape.ChangeColor(); }
+			if ((moving && DrawElement == null && !isContextMenu)) { selectedShape = null; moving = false;}
+			isContextMenu = false;
 			this.Refresh();
 			base.OnMouseUp(e);
 		}
@@ -117,18 +122,12 @@ namespace PetriNets
 
 		private void ContextMenuT(Point location)
 		{
-			if(selectedForMenuShape != null)
-			{
-				selectedForMenuShape.ChangeColor();
-				selectedShape = null;
-			}
-			selectedForMenuShape = null;
+			selectedShape = null;
 			hitTestWithLine(location);
-			selectedForMenuShape = selectedShape;
 			Shapes.Remove(curLine);
 			var p = location;
 			p.Offset(50, 50);
-			if (selectedForMenuShape != null)
+			if (selectedShape != null)
 			{
 				var pos = selectedShape.getCenter();
 				if (selectedShape is Circle) { cmPlace.Show(p); }
@@ -304,14 +303,14 @@ namespace PetriNets
 				EditLabelName editLabel = new EditLabelName();
 				editLabel.ShowDialog();
 				if (editLabel.currentName != "")
-					selectedForMenuShape.RenameLabel(editLabel.currentName);
+					selectedShape.RenameLabel(editLabel.currentName);
 				this.Invalidate();
 			}
 		}
 
 		private void tsmDelete_Click(object sender, EventArgs e)
 		{
-			selectedForMenuShape.delete(Shapes);
+			selectedShape.delete(Shapes);
 			this.Invalidate();
 		}
 
@@ -322,7 +321,7 @@ namespace PetriNets
 			edit.label1.Text = "Новое кол-во токенов: ";
 			edit.ShowDialog();
 			if (edit.numberOfToken != -1)
-				(selectedForMenuShape as Circle).model.tokens = (uint)edit.numberOfToken;
+				(selectedShape as Circle).model.tokens = (uint)edit.numberOfToken;
 			this.Invalidate();
 		}
 
@@ -333,7 +332,7 @@ namespace PetriNets
 			edit.label1.Text = "Новый вес арки: ";
 			edit.ShowDialog();
 			if (edit.numberOfToken != -1)
-				(selectedForMenuShape as Line).mArc.weight = (uint)edit.numberOfToken;
+				(selectedShape as Line).mArc.weight = (uint)edit.numberOfToken;
 			this.Invalidate();
 		}
 	#endregion
