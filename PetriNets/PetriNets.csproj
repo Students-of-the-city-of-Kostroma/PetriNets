@@ -52,6 +52,12 @@
     <Compile Include="EditLabelName.Designer.cs">
       <DependentUpon>EditLabelName.cs</DependentUpon>
     </Compile>
+    <Compile Include="EditNumberOfTokens.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EditNumberOfTokens.Designer.cs">
+      <DependentUpon>EditNumberOfTokens.cs</DependentUpon>
+    </Compile>
     <Compile Include="PetriNet.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -62,6 +68,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="EditLabelName.resx">
       <DependentUpon>EditLabelName.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EditNumberOfTokens.resx">
+      <DependentUpon>EditNumberOfTokens.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="PetriNet.resx">
       <DependentUpon>PetriNet.cs</DependentUpon>

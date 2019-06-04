@@ -29,6 +29,7 @@ namespace PetriNets
 			DrawElement = DrawCircle;
 		}
 		IShape selectedShape;
+		IShape selectedForMenuShape;
 		bool moving;
 		Point previousPoint = Point.Empty;
 		Line curLine;
@@ -39,7 +40,6 @@ namespace PetriNets
 		#region onMouse methods
 		protected override void OnMouseDown(MouseEventArgs e)
 		{
-
 			hitTest(e.Location);
 			if (selectedShape != null) { moving = true; previousPoint = e.Location; selectedShape.ChangeColor(); }
 			base.OnMouseDown(e);
@@ -66,7 +66,7 @@ namespace PetriNets
 		protected override void OnMouseUp(MouseEventArgs e)
 		{
 			if (selectedShape != null) { selectedShape.ChangeColor(); }
-			if (moving && DrawElement == null) { selectedShape = null; moving = false; }
+			if ((moving && DrawElement == null)) { selectedShape = null; moving = false; }
 			this.Refresh();
 			base.OnMouseUp(e);
 		}
@@ -89,23 +89,51 @@ namespace PetriNets
 
 		private void CanvasClick(object sender, EventArgs e)
 		{
-			if (((MouseEventArgs)e).Button == MouseButtons.Right) { Shapes.Remove(curLine); }
 			var location = ((MouseEventArgs)e).Location;
-			if (isDeliting)
+			if (((MouseEventArgs)e).Button == MouseButtons.Right)
 			{
-				deleteElement(location);
+				ContextMenuT(location);
 			}
-			if (DrawElement != null)
+			else
 			{
-				DrawElement(location);
+				if (isDeliting)
+				{
+					deleteElement(location);
+				}
+				if (DrawElement != null)
+				{
+					DrawElement(location);
+				}
+				if (isLinening && resize)
+				{
+					resizingLine(location);
+				}
+				if (isLinening && !resize && selectedShape != null)
+				{
+					createNewLine(location);
+				}
 			}
-			if (isLinening && resize)
+		}
+
+		private void ContextMenuT(Point location)
+		{
+			if(selectedForMenuShape != null)
 			{
-				resizingLine(location);
+				selectedForMenuShape.ChangeColor();
+				selectedShape = null;
 			}
-			if (isLinening && !resize && selectedShape != null)
+			selectedForMenuShape = null;
+			hitTestWithLine(location);
+			selectedForMenuShape = selectedShape;
+			Shapes.Remove(curLine);
+			var p = location;
+			p.Offset(50, 50);
+			if (selectedForMenuShape != null)
 			{
-				createNewLine(location);
+				var pos = selectedShape.getCenter();
+				if (selectedShape is Circle) { cmPlace.Show(p); }
+				if (selectedShape is TRectangle) { cmTransition.Show(p); }
+				if (selectedShape is Line) { cmArc.Show(p); }
 			}
 		}
 
@@ -152,6 +180,7 @@ namespace PetriNets
 				editLabel.ShowDialog();
 				if (editLabel.currentName != "")
 					selectedShape.RenameLabel(editLabel.currentName);
+				this.Invalidate();
 			}
 
 		}
@@ -206,6 +235,11 @@ namespace PetriNets
 			for (var i = Shapes.Count - 1; i >= 0; i--)
 				if (Shapes[i].HitTest(location)) { if (!(Shapes[i] is Line)) { selectedShape = Shapes[i]; break; } }
 		}
+		private void hitTestWithLine(Point location)
+		{
+			for (var i = Shapes.Count - 1; i >= 0; i--)
+				if (Shapes[i].HitTest(location)) { { selectedShape = Shapes[i]; break; } }
+		}
 
 		private void resizingLine(Point location)
 		{
@@ -251,8 +285,7 @@ namespace PetriNets
 
 		private void deleteElement(Point location)
 		{
-			for (var i = Shapes.Count - 1; i >= 0; i--)
-				if (Shapes[i].HitTest(location)) { { selectedShape = Shapes[i]; break; } }
+			hitTestWithLine(location);
 			if (selectedShape != null)
 			{
 				this.Invalidate();
@@ -263,7 +296,47 @@ namespace PetriNets
 			}
 		}
 
-		#endregion
+
+		private void tbEdit_Click(object sender, EventArgs e)
+		{
+			if (selectedShape != null)
+			{
+				EditLabelName editLabel = new EditLabelName();
+				editLabel.ShowDialog();
+				if (editLabel.currentName != "")
+					selectedForMenuShape.RenameLabel(editLabel.currentName);
+				this.Invalidate();
+			}
+		}
+
+		private void tsmDelete_Click(object sender, EventArgs e)
+		{
+			selectedForMenuShape.delete(Shapes);
+			this.Invalidate();
+		}
+
+		private void editNumberOfTokens_Click(object sender, EventArgs e)
+		{
+			EditNumberOfSomething edit = new EditNumberOfSomething();
+			edit.Text = "Изменить количество токенов";
+			edit.label1.Text = "Новое кол-во токенов: ";
+			edit.ShowDialog();
+			if (edit.numberOfToken != -1)
+				(selectedForMenuShape as Circle).model.tokens = (uint)edit.numberOfToken;
+			this.Invalidate();
+		}
+
+		private void tsmEditWeight_Click(object sender, EventArgs e)
+		{
+			EditNumberOfSomething edit = new EditNumberOfSomething();
+			edit.Text = "Изменить вес арки";
+			edit.label1.Text = "Новый вес арки: ";
+			edit.ShowDialog();
+			if (edit.numberOfToken != -1)
+				(selectedForMenuShape as Line).mArc.weight = (uint)edit.numberOfToken;
+			this.Invalidate();
+		}
+	#endregion
 	}
 
 
@@ -340,9 +413,9 @@ namespace PetriNets
 			else
 				FillColor = DefaultColor;
 		}
-		public PointF getCenter()
+		public Point getCenter()
 		{
-			return (PointF)Center;
+			return Center;
 		}
 		public List<Line> getLines() { return inLines; }
 		public void delete(List<IShape> shapes)
@@ -469,7 +542,7 @@ namespace PetriNets
 			else
 				FillColor = DefaultColor;
 		}
-		public PointF getCenter() { return (PointF)Center; }
+		public Point getCenter() { return Center; }
 
 		public List<Line> getLines() { return inLines; }
 
@@ -547,7 +620,7 @@ namespace PetriNets
 
 		public void ChangeColor() { }
 
-		public PointF getCenter() { return PointF.Empty; }
+		public Point getCenter() { return Point.Empty; }
 
 		public PointF getEdge(Point curLocation) { return PointF.Empty; }
 
@@ -604,7 +677,7 @@ namespace PetriNets
 		void Move(Point d);
 		void RenameLabel(string newName);
 		void ChangeColor();
-		PointF getCenter();
+		Point getCenter();
 		void delete(List<IShape> shapes);
 	}
 
