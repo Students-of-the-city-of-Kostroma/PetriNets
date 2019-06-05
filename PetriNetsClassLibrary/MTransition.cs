@@ -11,7 +11,7 @@ namespace PetriNetsClassLibrary
 	{
 		public List<MArc> inPlaces { get; } = new List<MArc>();
 		public List<MArc> outPlaces { get; } = new List<MArc>();
-		bool isEnable;
+		public bool isEnable;
 
 		public string label
 		{
@@ -34,6 +34,7 @@ namespace PetriNetsClassLibrary
 			places.Add(arc);
 			return true;
 		}
+
 
 
 	}
