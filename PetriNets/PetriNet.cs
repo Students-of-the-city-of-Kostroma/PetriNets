@@ -154,17 +154,26 @@ namespace PetriNets
 
 		private void ContextMenuT(Point location)
 		{
-			selectedShape = null;
-			hitTestWithLine(location);
-			Shapes.Remove(curLine);
-			var p = location;
-			p.Offset(50, 50);
-			if (selectedShape != null)
+			if (resize)
 			{
-				var pos = selectedShape.getCenter();
-				if (selectedShape is Circle) { cmPlace.Show(p); }
-				if (selectedShape is TRectangle) { cmTransition.Show(p); }
-				if (selectedShape is Line) { cmArc.Show(p); }
+				Shapes.Remove(curLine);
+				resize = false;
+			}
+			if (!resize)
+			{
+				selectedShape = null;
+				hitTestWithLine(location);
+				Point p;
+				if (selectedShape is Line) p = location;
+				if (selectedShape != null)
+				{
+					p = selectedShape.getCenter();
+					p.Offset(100, 100);
+					var pos = selectedShape.getCenter();
+					if (selectedShape is Circle) { cmPlace.Show(p, ToolStripDropDownDirection.Default); }
+					if (selectedShape is TRectangle) { cmTransition.Show(p, ToolStripDropDownDirection.Default); }
+					if (selectedShape is Line) { cmArc.Show(p, ToolStripDropDownDirection.Default); }
+				}
 			}
 		}
 
@@ -287,6 +296,10 @@ namespace PetriNets
 				{
 					Shapes.Remove(curLine);
 					(startShape as INotArch).getLines().Remove(curLine);
+					selectedShape.ChangeColor();
+					selectedShape = null;
+					curLine = null;
+					return;
 				}
 				(selectedShape as INotArch).getLines().Add(curLine);
 				selectedShape.ChangeColor();
@@ -648,7 +661,6 @@ namespace PetriNets
 
 		public void delete(List<IShape> shapes)
 		{
-			shapes.Remove(this);
 			foreach (var line in inLines)
 			{
 				Circle circle;
@@ -663,6 +675,7 @@ namespace PetriNets
 				circle.inLines.Remove(line);
 				shapes.Remove(line);
 			}
+			shapes.Remove(this);
 		}
 
 		public void selectRectangle(Graphics g)
@@ -739,9 +752,11 @@ namespace PetriNets
 		{
 			Circle circle;
 			TRectangle rectangle;
-			if(this.startShape is Circle) { circle = (Circle)this.startShape; rectangle = (TRectangle)this.endShape; }
-			else { circle = (Circle)this.endShape; rectangle = (TRectangle)this.startShape; }
+			List<MArc> lines; 
+			if(this.startShape is Circle) { circle = (Circle)this.startShape; rectangle = (TRectangle)this.endShape; lines = ((TRectangle)this.endShape).model.inPlaces;  }
+			else { circle = (Circle)this.endShape; rectangle = (TRectangle)this.startShape; lines = ((TRectangle)this.endShape).model.outPlaces;  }
 			circle.inLines.Remove(this);
+			PetriNetsClassLibrary.PetriNet.CTransition.removeLink(this.mArc, lines);
 			rectangle.inLines.Remove(this);
 			shapes.Remove(this);
 		}
