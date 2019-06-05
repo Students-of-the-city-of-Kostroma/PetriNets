@@ -23,12 +23,15 @@ namespace PetriNets
 		DrawPetriNetElement DrawElement;
 		bool isDeliting = false;
 		int unicalLabelId = 0;
+		bool isEvaluating = false;
+		public List<TRectangle> rectangles { get; private set; }
 
 		public PetriNet()
 		{
 			InitializeComponent();
 			DoubleBuffered = true;
 			Shapes = new List<IShape>();
+			rectangles = new List<TRectangle>();
 			DrawElement = DrawCircle;
 		}
 		IShape selectedShape;
@@ -43,43 +46,56 @@ namespace PetriNets
 		#region onMouse methods
 		protected override void OnMouseDown(MouseEventArgs e)
 		{
-			if (((MouseEventArgs)e).Button == MouseButtons.Right)
+			if (!isEvaluating)
 			{
-				isContextMenu = true;
+				if (((MouseEventArgs)e).Button == MouseButtons.Right)
+				{
+					isContextMenu = true;
+				}
+				hitTest(e.Location);
+				if (selectedShape != null && !isContextMenu) { moving = true; previousPoint = e.Location; selectedShape.ChangeColor(); }
+				base.OnMouseDown(e);
 			}
-			hitTest(e.Location);
-			if (selectedShape != null && !isContextMenu) { moving = true; previousPoint = e.Location; selectedShape.ChangeColor(); }
-			base.OnMouseDown(e);
 		}
 
 		protected override void OnMouseMove(MouseEventArgs e)
 		{
-			if (moving && DrawElement == null && !resize)
+			if (!isEvaluating)
 			{
-				var d = new Point(e.X - previousPoint.X, e.Y - previousPoint.Y);
-				selectedShape.Move(d);
-				previousPoint = e.Location;
-				this.Invalidate();
+				if (moving && DrawElement == null && !resize)
+				{
+					var d = new Point(e.X - previousPoint.X, e.Y - previousPoint.Y);
+					selectedShape.Move(d);
+					previousPoint = e.Location;
+					this.Invalidate();
+				}
+				if (isLinening && resize)
+				{
+					var d = new Point(e.X - previousPoint.X, e.Y - previousPoint.Y);
+					curLine.Resize(d);
+					previousPoint = e.Location;
+					this.Invalidate();
+				}
+				base.OnMouseMove(e);
 			}
-			if (isLinening && resize)
-			{
-				var d = new Point(e.X - previousPoint.X, e.Y - previousPoint.Y);
-				curLine.Resize(d);
-				previousPoint = e.Location;
-				this.Invalidate();
-			}
-			base.OnMouseMove(e);
 		}
 		protected override void OnMouseUp(MouseEventArgs e)
 		{
-			if(selectedShape != null && !isContextMenu) { selectedShape.ChangeColor(); }
-			if ((moving && DrawElement == null && !isContextMenu)) { selectedShape = null; moving = false;}
-			isContextMenu = false;
-			this.Refresh();
-			base.OnMouseUp(e);
+			if (!isEvaluating)
+			{
+				if (selectedShape != null && !isContextMenu) { selectedShape.ChangeColor(); }
+				if ((moving && DrawElement == null && !isContextMenu)) { selectedShape = null; moving = false; }
+				isContextMenu = false;
+				this.Refresh();
+				base.OnMouseUp(e);
+			}
 		}
 		protected override void OnPaint(PaintEventArgs e)
 		{
+			if(isEvaluating)
+			{
+				foreach(var rectangle in rectangles) { rectangle.selectRectangle(e.Graphics); }
+			}
 			e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
 			foreach (var shape in Shapes)
 				shape.Draw(e.Graphics);
@@ -98,44 +114,66 @@ namespace PetriNets
 		private void CanvasClick(object sender, EventArgs e)
 		{
 			var location = ((MouseEventArgs)e).Location;
-			if (((MouseEventArgs)e).Button == MouseButtons.Right)
+			if (!isEvaluating)
 			{
-				ContextMenuT(location);
+				if (((MouseEventArgs)e).Button == MouseButtons.Right)
+				{
+					ContextMenuT(location);
+				}
+				else
+				{
+					if (isDeliting)
+					{
+						deleteElement(location);
+					}
+					if (DrawElement != null)
+					{
+						DrawElement(location);
+					}
+					if (isLinening && resize)
+					{
+						resizingLine(location);
+					}
+					if (isLinening && !resize && selectedShape != null)
+					{
+						createNewLine(location);
+					}
+				}
 			}
 			else
 			{
-				if (isDeliting)
+				hitTest(location);
+				if(selectedShape != null && selectedShape is TRectangle)
 				{
-					deleteElement(location);
+					PetriNetsClassLibrary.PetriNet.CTransition.exchangeTokens((selectedShape as TRectangle).model);
 				}
-				if (DrawElement != null)
-				{
-					DrawElement(location);
-				}
-				if (isLinening && resize)
-				{
-					resizingLine(location);
-				}
-				if (isLinening && !resize && selectedShape != null)
-				{
-					createNewLine(location);
-				}
+				PetriNetsClassLibrary.PetriNet.setRule();
+				this.Invalidate();
 			}
 		}
 
 		private void ContextMenuT(Point location)
 		{
-			selectedShape = null;
-			hitTestWithLine(location);
-			Shapes.Remove(curLine);
-			var p = location;
-			p.Offset(50, 50);
-			if (selectedShape != null)
+			if (resize)
 			{
-				var pos = selectedShape.getCenter();
-				if (selectedShape is Circle) { cmPlace.Show(p); }
-				if (selectedShape is TRectangle) { cmTransition.Show(p); }
-				if (selectedShape is Line) { cmArc.Show(p); }
+				Shapes.Remove(curLine);
+				resize = false;
+			}
+			if (!resize)
+			{
+				selectedShape = null;
+				hitTestWithLine(location);
+				Point p;
+				if (selectedShape is Line) p = location;
+				if (selectedShape != null)
+				{
+					p = selectedShape.getCenter();
+					p.Offset(100, 100);
+					var pos = selectedShape.getCenter();
+					if (selectedShape is Circle) { cmPlace.Show(p, ToolStripDropDownDirection.Default); }
+					if (selectedShape is TRectangle) { cmTransition.Show(p, ToolStripDropDownDirection.Default); }
+					if (selectedShape is Line) { cmArc.Show(p, ToolStripDropDownDirection.Default); }
+				}
 			}
 		}
 
@@ -174,17 +212,19 @@ namespace PetriNets
 
 		private void Form1_DoubleClick(object sender, EventArgs e)
 		{
-			var location = ((MouseEventArgs)e).Location;
-			hitTest(location);
-			if (selectedShape != null)
+			if (!isEvaluating)
 			{
-				EditLabelName editLabel = new EditLabelName();
-				editLabel.ShowDialog();
-				if (editLabel.currentName != "")
-					selectedShape.RenameLabel(editLabel.currentName);
-				this.Invalidate();
+				var location = ((MouseEventArgs)e).Location;
+				hitTest(location);
+				if (selectedShape != null)
+				{
+					EditLabelName editLabel = new EditLabelName();
+					editLabel.ShowDialog();
+					if (editLabel.currentName != "")
+						selectedShape.RenameLabel(editLabel.currentName);
+					this.Invalidate();
+				}
 			}
-
 		}
 		#endregion
 
@@ -202,6 +242,7 @@ namespace PetriNets
 		{
 			TRectangle rectangle = new TRectangle(Location, 50, 20, "t" + unicalLabelId++);
 			Shapes.Add(rectangle);
+			rectangles.Add(rectangle);
 			Graphics g = this.CreateGraphics();
 			rectangle.Draw(g);
 			g.Dispose();
@@ -255,6 +296,10 @@ namespace PetriNets
 				{
 					Shapes.Remove(curLine);
 					(startShape as INotArch).getLines().Remove(curLine);
+					selectedShape.ChangeColor();
+					selectedShape = null;
+					curLine = null;
+					return;
 				}
 				(selectedShape as INotArch).getLines().Add(curLine);
 				selectedShape.ChangeColor();
@@ -294,6 +339,7 @@ namespace PetriNets
 				if (DialogResult.Yes == MessageBox.Show("Вы хотите удалить этот объект?", "Удаление объекта", MessageBoxButtons.YesNo))
 				{
 					selectedShape.delete(Shapes);
+					if(selectedShape is TRectangle) { rectangles.Remove(selectedShape as TRectangle); }
 				}
 			}
 		}
@@ -381,6 +427,25 @@ namespace PetriNets
 				}
 			}
 			Refresh();
+		}
+
+		private void bindingNavigatorMoveNextItem_Click(object sender, EventArgs e)
+		{
+			isEvaluating = true;
+			PetriNetsClassLibrary.PetriNet.setRule();
+			Cursor = Cursors.Cross;
+			foreach(var rectangle in rectangles)
+			{
+				rectangle.selectRectangle(this.CreateGraphics());
+			}
+			this.Invalidate();
+		}
+
+		private void stop_Click(object sender, EventArgs e)
+		{
+			isEvaluating = false;
+			this.Invalidate();
+			Cursor = Cursors.Default;
 		}
 	}
 
@@ -537,6 +602,7 @@ namespace PetriNets
 			label = new Label(new Point(_Center.X + 10, _Center.Y + 10), labelText);
 			inLines = new List<Line>();
 			model = new MTransition(labelText);
+			PetriNetsClassLibrary.PetriNet.CTransition.allTransition.Add(model);
 		}
 		public MTransition model;
 		public List<Line> inLines { get; set; }
@@ -595,7 +661,6 @@ namespace PetriNets
 
 		public void delete(List<IShape> shapes)
 		{
-			shapes.Remove(this);
 			foreach (var line in inLines)
 			{
 				Circle circle;
@@ -610,6 +675,17 @@ namespace PetriNets
 				circle.inLines.Remove(line);
 				shapes.Remove(line);
 			}
+			shapes.Remove(this);
+		}
+
+		public void selectRectangle(Graphics g)
+		{
+			Pen pen;
+			if (this.model.isEnable)
+				pen = new Pen(Brushes.Green, 10);
+			else pen = new Pen(Brushes.Red, 10);
+			using (var path = GetPath())
+				g.DrawPath(pen, path);
 		}
 	}
 
@@ -676,12 +752,15 @@ namespace PetriNets
 		{
 			Circle circle;
 			TRectangle rectangle;
-			if(this.startShape is Circle) { circle = (Circle)this.startShape; rectangle = (TRectangle)this.endShape; }
-			else { circle = (Circle)this.endShape; rectangle = (TRectangle)this.startShape; }
+			List<MArc> lines; 
+			if(this.startShape is Circle) { circle = (Circle)this.startShape; rectangle = (TRectangle)this.endShape; lines = ((TRectangle)this.endShape).model.inPlaces;  }
+			else { circle = (Circle)this.endShape; rectangle = (TRectangle)this.startShape; lines = ((TRectangle)this.endShape).model.outPlaces;  }
 			circle.inLines.Remove(this);
+			PetriNetsClassLibrary.PetriNet.CTransition.removeLink(this.mArc, lines);
 			rectangle.inLines.Remove(this);
 			shapes.Remove(this);
 		}
+
 
 	}
 

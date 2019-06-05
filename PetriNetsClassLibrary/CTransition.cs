@@ -17,6 +17,8 @@ namespace PetriNetsClassLibrary
 			}
 		}
 
+		public List<MTransition> enabledTransition { get; set; } = new List<MTransition>();
+
 		public CTransition()
 		{
 			_allTransition = new List<MTransition>();
@@ -32,5 +34,20 @@ namespace PetriNetsClassLibrary
 		{
 			arcs.Remove(arc);
 		}
+
+		public void exchangeTokens(MTransition transition)
+		{
+			if (transition.isEnable)
+			{
+				foreach(var inArc in transition.inPlaces) {
+					inArc.edge.edge.Item1.tokens = inArc.edge.edge.Item1.tokens - inArc.weight;
+				}
+				foreach(var outArc in transition.outPlaces)
+				{
+					outArc.edge.edge.Item1.tokens += outArc.weight;
+				}
+			}
+		}
+
 	}
 }
