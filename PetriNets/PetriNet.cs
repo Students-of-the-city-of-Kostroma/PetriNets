@@ -18,7 +18,7 @@ namespace PetriNets
 	public partial class PetriNet : Form
 	{
 		public List<IShape> Shapes { get; private set; }
-		delegate void DrawPetriNetElement(Point location);
+		delegate bool DrawPetriNetElement(Point location);
 		bool isLinening = false;
 		DrawPetriNetElement DrawElement;
 		bool isDeliting = false;
@@ -229,16 +229,17 @@ namespace PetriNets
 		#endregion
 
 		#region drawing methods
-		void DrawCircle(Point Location)
+		bool DrawCircle(Point Location)
 		{
 			Circle circle = new Circle(Location, 20, "P" + unicalLabelId++);
 			Shapes.Add(circle);
 			Graphics g = this.CreateGraphics();
 			circle.Draw(g);
 			g.Dispose();
+			return true;
 		}
 
-		void DrawRectangle(Point Location)
+		bool DrawRectangle(Point Location)
 		{
 			TRectangle rectangle = new TRectangle(Location, 50, 20, "t" + unicalLabelId++);
 			Shapes.Add(rectangle);
@@ -246,11 +247,12 @@ namespace PetriNets
 			Graphics g = this.CreateGraphics();
 			rectangle.Draw(g);
 			g.Dispose();
+			return true;
 		}
 		#endregion
 
 		#region private methods 
-		private void createNewLine(Point location)
+		private bool createNewLine(Point location)
 		{
 			Line line = new Line();
 			line.points.Add(selectedShape.getCenter());
@@ -265,6 +267,7 @@ namespace PetriNets
 			curLine.startShape = selectedShape;
 			(startShape as INotArch).getLines().Add(line);
 			selectedShape = null;
+			return true;
 		}
 
 		private bool isValidArch(IShape startShape, IShape endShape)
