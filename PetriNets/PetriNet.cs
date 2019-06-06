@@ -231,43 +231,58 @@ namespace PetriNets
 		#region drawing methods
 		bool DrawCircle(Point Location)
 		{
-			Circle circle = new Circle(Location, 20, "P" + unicalLabelId++);
-			Shapes.Add(circle);
-			Graphics g = this.CreateGraphics();
-			circle.Draw(g);
-			g.Dispose();
-			return true;
+			try
+			{
+				Circle circle = new Circle(Location, 20, "P" + unicalLabelId++);
+				Shapes.Add(circle);
+				Graphics g = this.CreateGraphics();
+				circle.Draw(g);
+				g.Dispose();
+				return true;
+			}
+			catch
+			{
+				return false;
+			}
 		}
 
 		bool DrawRectangle(Point Location)
 		{
-			TRectangle rectangle = new TRectangle(Location, 50, 20, "t" + unicalLabelId++);
-			Shapes.Add(rectangle);
-			rectangles.Add(rectangle);
-			Graphics g = this.CreateGraphics();
-			rectangle.Draw(g);
-			g.Dispose();
-			return true;
+			try
+			{
+				TRectangle rectangle = new TRectangle(Location, 50, 20, "t" + unicalLabelId++);
+				Shapes.Add(rectangle);
+				rectangles.Add(rectangle);
+				Graphics g = this.CreateGraphics();
+				rectangle.Draw(g);
+				g.Dispose();
+				return true;
+			}
+			catch { return false; }
 		}
 		#endregion
 
 		#region private methods 
 		private bool createNewLine(Point location)
 		{
-			Line line = new Line();
-			line.points.Add(selectedShape.getCenter());
-			line.points.Add(new PointF(selectedShape.getCenter().X + 1, selectedShape.getCenter().Y + 1));
-			Shapes.Insert(0, line);
-			line.Draw(this.CreateGraphics());
-			curLine = line;
-			previousPoint = location;
-			resize = true;
-			startShape = selectedShape;
-			selectedShape.ChangeColor();
-			curLine.startShape = selectedShape;
-			(startShape as INotArch).getLines().Add(line);
-			selectedShape = null;
-			return true;
+			try
+			{
+				Line line = new Line();
+				line.points.Add(selectedShape.getCenter());
+				line.points.Add(new PointF(selectedShape.getCenter().X + 1, selectedShape.getCenter().Y + 1));
+				Shapes.Insert(0, line);
+				line.Draw(this.CreateGraphics());
+				curLine = line;
+				previousPoint = location;
+				resize = true;
+				startShape = selectedShape;
+				selectedShape.ChangeColor();
+				curLine.startShape = selectedShape;
+				(startShape as INotArch).getLines().Add(line);
+				selectedShape = null;
+				return true;
+			}
+			catch { return false; }
 		}
 
 		private bool isValidArch(IShape startShape, IShape endShape)
