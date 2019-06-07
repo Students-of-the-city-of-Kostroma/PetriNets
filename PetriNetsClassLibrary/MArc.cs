@@ -24,7 +24,7 @@ namespace PetriNetsClassLibrary
 			get { return Weight; }
 			set
 			{
-				if (value < 0)
+				if (value <= 0)
 					throw new Exception("Можно вводить только положительные числа");
 				Weight = value;
 			}
