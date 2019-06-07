@@ -136,7 +136,7 @@ namespace PetriNets
 					}
 					if (isLinening && !resize && selectedShape != null)
 					{
-						createNewLine(location);
+						bool l = createNewLine(location);
 					}
 				}
 			}
@@ -229,7 +229,7 @@ namespace PetriNets
 		#endregion
 
 		#region drawing methods
-		bool DrawCircle(Point Location)
+		public bool DrawCircle(Point Location)
 		{
 			try
 			{
@@ -246,7 +246,7 @@ namespace PetriNets
 			}
 		}
 
-		bool DrawRectangle(Point Location)
+		public bool DrawRectangle(Point Location)
 		{
 			try
 			{
@@ -263,7 +263,7 @@ namespace PetriNets
 		#endregion
 
 		#region private methods 
-		private bool createNewLine(Point location)
+		public bool createNewLine(Point location)
 		{
 			try
 			{
@@ -348,7 +348,7 @@ namespace PetriNets
 			return PetriNetsClassLibrary.PetriNet.CTransition.addArc(mTransition, line.mArc);
 		}
 
-		private void deleteElement(Point location)
+		public bool deleteElement(Point location)
 		{
 			hitTestWithLine(location);
 			if (selectedShape != null)
@@ -358,8 +358,10 @@ namespace PetriNets
 				{
 					selectedShape.delete(Shapes);
 					if(selectedShape is TRectangle) { rectangles.Remove(selectedShape as TRectangle); }
+					return true;
 				}
 			}
+			return false;
 		}
 
 
