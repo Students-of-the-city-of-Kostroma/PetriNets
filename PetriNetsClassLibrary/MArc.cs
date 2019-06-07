@@ -9,6 +9,7 @@ namespace PetriNetsClassLibrary
 	[Serializable]
 	public class MArc : Model
 	{
+		uint Weight;
 		public MArc()
 		{
 			weight = 1;
@@ -20,7 +21,13 @@ namespace PetriNetsClassLibrary
 		}
 		public uint weight
 		{
-			get;set;
+			get { return Weight; }
+			set
+			{
+				if (value <= 0)
+					throw new Exception("Можно вводить только положительные числа");
+				Weight = value;
+			}
 		}
 
 		public Edge edge
