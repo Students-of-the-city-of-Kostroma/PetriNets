@@ -572,14 +572,19 @@ namespace PetriNets
 		/// <returns>Успешность редактирования</returns>
 		private void tsmEditWeight_Click(object sender, EventArgs e)
 		{
-			EditNumberOfSomething edit = new EditNumberOfSomething();
-			edit.Text = "Изменить вес арки";
-			edit.label1.Text = "Новый вес арки: ";
-			edit.ShowDialog();
-			if (edit.numberOfToken != -1)
+			try
 			{
-				(selectedShape as Line).mArc.weight = (uint)edit.numberOfToken;
+				EditNumberOfSomething edit = new EditNumberOfSomething();
+				edit.Text = "Изменить вес арки";
+				edit.label1.Text = "Новый вес арки: ";
+				edit.ShowDialog();
+				if (edit.numberOfToken != -1)
+					(selectedShape as Line).mArc.weight = (uint)edit.numberOfToken;
 				this.Invalidate();
+			}
+			catch(Exception ex)
+			{
+				MessageBox.Show(ex.Message);
 			}
 		}
 		#endregion
