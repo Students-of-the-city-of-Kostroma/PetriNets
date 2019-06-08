@@ -165,7 +165,6 @@ namespace PetriNets
 			e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
 			foreach (var shape in Shapes)
 				shape.Draw(g);
-			
 		}
 		#endregion
 
@@ -368,7 +367,7 @@ namespace PetriNets
 		{
 			try
 			{
-				TRectangle rectangle = new TRectangle(Location, 50, 20, "t" + unicalLabelId++);
+				TRectangle rectangle = new TRectangle(Location, 50, 50, "t" + unicalLabelId++);
 				Shapes.Add(rectangle);
 				rectangles.Add(rectangle);
 				Graphics g = this.CreateGraphics();
@@ -912,7 +911,7 @@ namespace PetriNets
 		/// </summary>
 		/// <param name="Location">Поиск ближайшей точки относительно этой точки</param>
 		/// <returns>Ближайшая точка на границе</returns>
-		public PointF getClosestEdge(Point Location)
+		public PointF getClosestEdge(PointF Location)
 		{
 			float sqrt = (float)Math.Sqrt(Math.Pow(Location.X - Center.X, 2) + Math.Pow(Location.Y - Center.Y, 2));
 			float cx = Center.X + Radious * (Location.X - Center.X) / sqrt;
@@ -1113,32 +1112,32 @@ namespace PetriNets
 		/// </summary>
 		/// <param name="Location">Поиск относительно этой точки</param>
 		/// <returns>Ближайшая точка на границе</returns>
-		public PointF getClosestEdge(Point Location)
+		public PointF getClosestEdge(PointF Location)
 		{
 			var bounds = GetPath().GetBounds();
 			float d1, d2, d3, d4;
-			var leftClosest = FindClosestPointOnLine(new PointF((int)bounds.Left, Center.Y + height / 2), 
-											  new PointF((int)bounds.Left, Center.Y - height / 2), 
-											  Location, out d1);
-			var rightClosest = FindClosestPointOnLine(new PointF((int)bounds.Right, Center.Y + height / 2),
-											  new PointF((int)bounds.Right, Center.Y - height / 2),
-											  Location, out d2);
+			double l1, l2, l3, l4;
+			var leftClosest = FindClosestPointOnLine(new PointF((int)bounds.Left, Center.Y + height / 2 - 5),
+											  new PointF((int)bounds.Left, Center.Y - height / 2 + 5),
+											  Location, out d1, out l1);
+			var rightClosest = FindClosestPointOnLine(new PointF((int)bounds.Right, Center.Y + height / 2 - 5),
+											  new PointF((int)bounds.Right, Center.Y - height / 2 + 5),
+											  Location, out d2, out l2);
 			var bottomClosest = FindClosestPointOnLine(new PointF(Center.X + width / 2, (int)bounds.Bottom),
 											  new PointF(Center.X - width / 2, (int)bounds.Bottom),
-											  Location, out d3);
+											  Location, out d3, out l3);
 			var topClosest = FindClosestPointOnLine(new PointF(Center.X + width / 2, (int)bounds.Top),
 											  new PointF(Center.X - width / 2, (int)bounds.Top),
-											  Location, out d4);
-			var minDistance = (new double[4] { d1, d2, d3, d4 }).Min();
+											  Location, out d4, out l4);
+			var minDistance = (new float[4] { d1, d2, d3, d4}).Min();
 			if (minDistance == d1)
 				return leftClosest;
-			if (minDistance == d2)
+			else if (minDistance == d2)
 				return rightClosest;
-			if (minDistance == d3)
-				return new PointF(bottomClosest.X, bounds.Bottom);
-			if (minDistance == d4)
-				return new PointF(topClosest.X, bounds.Top);
-			return leftClosest;
+			else if (minDistance == d4)
+				return topClosest;
+			else
+				return bottomClosest;
 		}
 		
 		/// <summary>
@@ -1149,16 +1148,20 @@ namespace PetriNets
 		/// <param name="p">точка относительно которой происходит поиск</param>
 		/// <param name="distance">Дистанция от точки до линии</param>
 		/// <returns>ближайшая точка</returns>
-		private PointF FindClosestPointOnLine(PointF edgeStart, PointF edgeEnd, PointF p, out float distance)
+		private PointF FindClosestPointOnLine(PointF edgeStart, PointF edgeEnd, PointF p, out float distance, out double lever)
 		{
-			var A = edgeStart.Y - edgeEnd.Y;
-			var B = edgeEnd.X - edgeStart.X;
-			var C = edgeStart.X * edgeEnd.Y - edgeEnd.X * edgeStart.Y;
-			var ab = A * A + B * B;
-			float cx = ((B * B * p.X - A * (B * p.Y + C)) / (float)ab);
-			float cy = ((A*A * p.Y - B * (B * p.X + C)) / (float)ab);
-			var levelRatio = (float)A * (float)(p.Y - edgeStart.Y) + (float)B * (float)(edgeStart.X - p.X) / (float)ab;
-			distance = (float)Math.Abs(A*p.X + B*p.Y + C) / (float)ab;
+			float A = edgeStart.Y - edgeEnd.Y;
+			float B = edgeEnd.X - edgeStart.X;
+			float C = edgeStart.X * edgeEnd.Y - edgeEnd.X * edgeStart.Y;
+			float ab = A * A + B * B;
+			float cx = (float)(B*(B*p.X - A*p.Y) - A*C) / (float)ab;
+			float cy = (float)(A*((-B)*p.X+A*p.Y)- B*C) / (float)ab;
+			lever = Math.Abs((A * (p.Y - edgeStart.Y) + B * (edgeStart.X - p.X)) / ab);
+			distance = (float)Math.Abs(A*p.X + B*p.Y + C) / (float)Math.Sqrt(ab);
+			if (cx < edgeStart.X || cx > edgeEnd.X)
+				cx = (edgeStart.X + edgeEnd.X) / 2;
+			if (cy < edgeStart.Y || cy > edgeEnd.Y)
+				cy = (edgeStart.Y + edgeEnd.Y) / 2;
 			return new PointF(cx, cy);
 		}
 	}
@@ -1262,7 +1265,14 @@ namespace PetriNets
 		/// <param name="d">отклонение от последней точки</param>
 		public void Resize(Point d)
 		{
-			points[points.Count - 1] = new PointF(points[points.Count - 1].X + d.X, points[points.Count - 1].Y + d.Y);
+			PointF newPoint = new PointF(points[points.Count - 1].X + d.X, points[points.Count - 1].Y + d.Y);
+			if (endShape == null)
+				points[points.Count - 1] = newPoint;
+			if (endShape != null)
+			{
+				var p = (endShape as INotArch).getClosestEdge(points[points.Count - 2]);
+				points[points.Count - 1] = new PointF(p.X, p.Y);
+			}
 		}
 		/// <summary>
 		/// Изменение размера линии путем замены первого поинта в массиве точек points для кривой
@@ -1402,7 +1412,7 @@ namespace PetriNets
 	public interface INotArch
 	{
 		List<Line> getLines();
-		PointF getClosestEdge(Point Location);
+		PointF getClosestEdge(PointF Location);
 	}
 
 	public abstract class Shape
