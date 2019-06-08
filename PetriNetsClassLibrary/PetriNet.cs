@@ -4,14 +4,22 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+/// <summary>
+/// Общий класс для хранения контроллера CTransition и выполнения некоторых операция над сетью петри
+/// </summary>
 namespace PetriNetsClassLibrary
 {
 	public static class PetriNet
 	{
-		public static CArc cArc = new CArc();
+		/// <summary>
+		/// Контроллер CTransition
+		/// </summary>
 		public static CTransition CTransition = new CTransition();
-		public static CPlace CPlace = new CPlace();
 
+		/// <summary>
+		/// Метод устанавливающий поле isEnable для всех переходов MTransition из CTransition.
+		/// А так же записывающий включеные переход MTransition
+		/// </summary>
 		public static void setRule()
 		{
 			bool isEnable = true;

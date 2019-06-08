@@ -15,16 +15,43 @@ using PetriNetsClassLibrary;
 
 namespace PetriNets
 {
+	/// <summary>
+	/// View форма для редактирования и выполнения сетей Петри
+	/// </summary>
 	public partial class PetriNet : Form
 	{
+		/// <summary>
+		/// Хранение фигур отображенных на форме
+		/// </summary>
 		public List<IShape> Shapes { get; private set; }
+		/// <summary>
+		/// Делегат для методов рисования Circle и TRectangle
+		/// </summary>
+		/// <param name="location">Центр-Позиция в которой происходит рисовани</param>
+		/// <returns></returns>
 		delegate bool DrawPetriNetElement(Point location);
+		/// <summary>
+		/// Линия выбрана в качестве элемента рисования?
+		/// </summary>
 		bool isLinening = false;
 		DrawPetriNetElement DrawElement;
+		/// <summary>
+		/// Выбрано ли удаление в качестве текущего режима
+		/// </summary>
 		bool isDeliting = false;
+		/// <summary>
+		/// Уникальный ид для наименования лейблов по умолчанию
+		/// </summary>
 		int unicalLabelId = 0;
+		/// <summary>
+		/// Включен ли режим выполения сети
+		/// </summary>
 		bool isEvaluating = false;
+		/// <summary>
+		/// Хранени всех объектов типа TRectangle на View
+		/// </summary>
 		public List<TRectangle> rectangles { get; private set; }
+
 
 		public PetriNet()
 		{
@@ -34,16 +61,41 @@ namespace PetriNets
 			rectangles = new List<TRectangle>();
 			DrawElement = DrawCircle;
 		}
+		/// <summary>
+		/// Фигура на форме выбранная в настоящий момент
+		/// </summary>
 		IShape selectedShape;
+		/// <summary>
+		/// Происходит ли передвижение объектов
+		/// </summary>
 		bool moving;
+		/// <summary>
+		/// Предыдущая позиция объекта сетей петри на View для реализации передвижения
+		/// </summary>
 		Point previousPoint = Point.Empty;
+		/// <summary>
+		/// Текущая линия Line
+		/// </summary>
 		Line curLine;
+		/// <summary>
+		/// Изменяется ли сейчас линия
+		/// </summary>
 		bool resize;
+		/// <summary>
+		/// Фигура Circle или TRectangle к которой зацепилась линия
+		/// </summary>
 		IShape startShape;
+		/// <summary>
+		/// Режим контекстного меню
+		/// </summary>
 		bool isContextMenu = false;
 
 
 		#region onMouse methods
+		/// <summary>
+		/// Происходит хит-тест на попадание в фигура на форме.
+		/// </summary>
+		/// <param name="e"></param>
 		protected override void OnMouseDown(MouseEventArgs e)
 		{
 			if (!isEvaluating)
@@ -53,11 +105,15 @@ namespace PetriNets
 					isContextMenu = true;
 				}
 				hitTest(e.Location);
-				if (selectedShape != null && !isContextMenu) { moving = true; previousPoint = e.Location; selectedShape.ChangeColor(); }
+				if (selectedShape != null && !isContextMenu) { moving = true; previousPoint = e.Location; selectedShape.Select(); }
 				base.OnMouseDown(e);
 			}
 		}
 
+		/// <summary>
+		/// Если в OnMouseDown хит-тест успешен, то происходит передвижение объкта IShape
+		/// </summary>
+		/// <param name="e"></param>
 		protected override void OnMouseMove(MouseEventArgs e)
 		{
 			if (!isEvaluating)
@@ -79,30 +135,47 @@ namespace PetriNets
 				base.OnMouseMove(e);
 			}
 		}
+		/// <summary>
+		/// Значения булевых переменных нужных для OnMouseMove устанавливается в начальное положение
+		/// </summary>
+		/// <param name="e"></param>
 		protected override void OnMouseUp(MouseEventArgs e)
 		{
 			if (!isEvaluating)
 			{
-				if (selectedShape != null && !isContextMenu) { selectedShape.ChangeColor(); }
+				if (selectedShape != null && !isContextMenu) { selectedShape.Unselect(); }
 				if ((moving && DrawElement == null && !isContextMenu)) { selectedShape = null; moving = false; }
 				isContextMenu = false;
 				this.Refresh();
 				base.OnMouseUp(e);
 			}
 		}
+
+		/// <summary>
+		/// Событие переотрисовки объектов на форме, при ее обновлении
+		/// </summary>
+		/// <param name="e"></param>
 		protected override void OnPaint(PaintEventArgs e)
 		{
+			Graphics g = e.Graphics;
 			if(isEvaluating)
 			{
-				foreach(var rectangle in rectangles) { rectangle.selectRectangle(e.Graphics); }
+				foreach(var rectangle in rectangles) { rectangle.selectRectangle(g); }
 			}
 			e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
 			foreach (var shape in Shapes)
-				shape.Draw(e.Graphics);
+				shape.Draw(g);
+			
 		}
 		#endregion
 
 		#region click methods
+
+		/// <summary>
+		/// Выбор в качестве делегата DrawElement функции DrawCircle
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void circle_Click(object sender, EventArgs e)
 		{
 			DrawElement = DrawCircle;
@@ -111,6 +184,7 @@ namespace PetriNets
 			this.Cursor = Cursors.Arrow;
 		}
 
+
 		private void CanvasClick(object sender, EventArgs e)
 		{
 			var location = ((MouseEventArgs)e).Location;
@@ -118,24 +192,29 @@ namespace PetriNets
 			{
 				if (((MouseEventArgs)e).Button == MouseButtons.Right)
 				{
+					///Вызов контекстного меню
 					ContextMenuT(location);
 				}
 				else
 				{
 					if (isDeliting)
 					{
+						//Удаление элемента по указаной позиции 
 						deleteElement(location);
 					}
 					if (DrawElement != null)
 					{
+						//Рисование выбраного объекта через делегат
 						DrawElement(location);
 					}
 					if (isLinening && resize)
 					{
+						//Resize существующей линии
 						resizingLine(location);
 					}
 					if (isLinening && !resize && selectedShape != null)
 					{
+						//Создание новой линии
 						createNewLine(location);
 					}
 				}
@@ -145,6 +224,7 @@ namespace PetriNets
 				hitTest(location);
 				if(selectedShape != null && selectedShape is TRectangle)
 				{
+					//Выполнение сети Петри
 					PetriNetsClassLibrary.PetriNet.CTransition.exchangeTokens((selectedShape as TRectangle).model);
 				}
 				PetriNetsClassLibrary.PetriNet.setRule();
@@ -152,6 +232,10 @@ namespace PetriNets
 			}
 		}
 
+		/// <summary>
+		/// Вызов соответсвуещего объкту контекстного меню
+		/// </summary>
+		/// <param name="location">Положение вызова меню</param>
 		private void ContextMenuT(Point location)
 		{
 			if (resize)
@@ -177,6 +261,11 @@ namespace PetriNets
 			}
 		}
 
+		/// <summary>
+		/// Выбор в качестве делегата DrawElement функции DrawRectangle
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void rectangle_Click(object sender, EventArgs e)
 		{
 			DrawElement = DrawRectangle;
@@ -185,7 +274,11 @@ namespace PetriNets
 			this.Cursor = Cursors.Arrow;
 		}
 
-
+		/// <summary>
+		/// Выбор режима рисования линий
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void line_Click(object sender, EventArgs e)
 		{
 			isDeliting = false;
@@ -194,6 +287,11 @@ namespace PetriNets
 			this.Cursor = Cursors.Arrow;
 		}
 
+		/// <summary>
+		/// Выбор режима управления курсором
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void toolStripButton1_Click(object sender, EventArgs e)
 		{
 			DrawElement = null;
@@ -202,6 +300,11 @@ namespace PetriNets
 			this.Cursor = Cursors.Arrow;
 		}
 
+		/// <summary>
+		/// Выбор режима удаления объекта
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void toolStripButton2_Click(object sender, EventArgs e)
 		{
 			DrawElement = null;
@@ -210,6 +313,11 @@ namespace PetriNets
 			this.Cursor = Cursors.Cross;
 		}
 
+		/// <summary>
+		/// Открытие формы изменения названия объекта при двойном щелчке
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void Form1_DoubleClick(object sender, EventArgs e)
 		{
 			if (!isEvaluating)
@@ -229,6 +337,11 @@ namespace PetriNets
 		#endregion
 
 		#region drawing methods
+		/// <summary>
+		/// Рисование объекта Circle по указаной позиции
+		/// </summary>
+		/// <param name="Location">Центр-Позиция для рисования</param>
+		/// <returns></returns>
 		bool DrawCircle(Point Location)
 		{
 			try
@@ -246,6 +359,11 @@ namespace PetriNets
 			}
 		}
 
+		/// <summary>
+		/// Рисование объекта TRectangle по указаной позиции
+		/// </summary>
+		/// <param name="Location">Центр-Позиция для рисования</param>
+		/// <returns></returns>
 		bool DrawRectangle(Point Location)
 		{
 			try
@@ -263,6 +381,12 @@ namespace PetriNets
 		#endregion
 
 		#region private methods 
+
+		/// <summary>
+		/// Создание новой линии в указанной позиции. И добавлении фигуры которая является началом линии
+		/// </summary>
+		/// <param name="location">Позиция</param>
+		/// <returns></returns>
 		private bool createNewLine(Point location)
 		{
 			try
@@ -276,7 +400,7 @@ namespace PetriNets
 				previousPoint = location;
 				resize = true;
 				startShape = selectedShape;
-				selectedShape.ChangeColor();
+				selectedShape.Unselect();
 				curLine.startShape = selectedShape;
 				(startShape as INotArch).getLines().Add(line);
 				selectedShape = null;
@@ -285,6 +409,12 @@ namespace PetriNets
 			catch { return false; }
 		}
 
+		/// <summary>
+		/// Проверяет валидна ли такая арка. Арка валидна если начало и конец разных типов {TRectangle, Circle}
+		/// </summary>
+		/// <param name="startShape">Фигура начала объекта Line </param>
+		/// <param name="endShape">Фигура на конца объекта Line</param>
+		/// <returns>Валидна ли арка</returns>
 		private bool isValidArch(IShape startShape, IShape endShape)
 		{
 			if (startShape is Circle) { if (endShape is TRectangle) { return true; } }
@@ -302,6 +432,10 @@ namespace PetriNets
 				if (Shapes[i].HitTest(location)) { { selectedShape = Shapes[i]; break; } }
 		}
 
+		/// <summary>
+		/// Добавление новой точки в кривую и проверка валидности в случае если попали в объект
+		/// </summary>
+		/// <param name="location">точка для добавления</param>
 		private void resizingLine(Point location)
 		{
 			curLine.points.Add(location);
@@ -314,19 +448,24 @@ namespace PetriNets
 				{
 					Shapes.Remove(curLine);
 					(startShape as INotArch).getLines().Remove(curLine);
-					selectedShape.ChangeColor();
+					selectedShape.Unselect();
 					selectedShape = null;
 					curLine = null;
 					return;
 				}
 				(selectedShape as INotArch).getLines().Add(curLine);
-				selectedShape.ChangeColor();
+				selectedShape.Unselect();
 				selectedShape = null;
 				curLine = null;
 			}
 			this.Invalidate();
 		}
 
+		/// <summary>
+		/// Создать ребро между указанными в линии startShape и endShape
+		/// </summary>
+		/// <param name="line"></param>
+		/// <returns></returns>
 		private Edge createEdge(Line line)
 		{
 			MTransition mTransition;
@@ -339,6 +478,11 @@ namespace PetriNets
 			return new Edge(mPlace, mTransition, status);
 		}
 
+		/// <summary>
+		/// Добавить переход MTransition в соответствии с объектами указанными в линии startShape и endShape
+		/// </summary>
+		/// <param name="line">объект Line откуда берутся объекты</param>
+		/// <returns></returns>
 		private bool addTransition(Line line)
 		{
 			MTransition mTransition;
@@ -348,7 +492,13 @@ namespace PetriNets
 			return PetriNetsClassLibrary.PetriNet.CTransition.addArc(mTransition, line.mArc);
 		}
 
-		private void deleteElement(Point location)
+
+		/// <summary>
+		/// Удаление элемента находящегося в указаной локации
+		/// </summary>
+		/// <param name="location"></param>
+		/// <returns>Удален ли элемент по указаной позиции</returns>
+		private bool deleteElement(Point location)
 		{
 			hitTestWithLine(location);
 			if (selectedShape != null)
@@ -358,11 +508,17 @@ namespace PetriNets
 				{
 					selectedShape.delete(Shapes);
 					if(selectedShape is TRectangle) { rectangles.Remove(selectedShape as TRectangle); }
+					return true;
 				}
 			}
+			return false;
 		}
 
-
+		/// <summary>
+		/// Открытие формы-редактора наименования фигуры из контекстного меню
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void tbEdit_Click(object sender, EventArgs e)
 		{
 			if (selectedShape != null)
@@ -375,12 +531,26 @@ namespace PetriNets
 			}
 		}
 
+		/// <summary>
+		/// Событие для пункта Удалить контекстного меню
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void tsmDelete_Click(object sender, EventArgs e)
 		{
-			selectedShape.delete(Shapes);
-			this.Invalidate();
+			if (selectedShape != null)
+			{
+				selectedShape.delete(Shapes);
+				this.Invalidate();
+			}
 		}
 
+		/// <summary>
+		/// Редактирование количества токенов выбранного объекта Circle
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		/// <returns>Успешно ли прошло редактирование</returns>
 		private void editNumberOfTokens_Click(object sender, EventArgs e)
 		{
 			EditNumberOfSomething edit = new EditNumberOfSomething();
@@ -388,10 +558,18 @@ namespace PetriNets
 			edit.label1.Text = "Новое кол-во токенов: ";
 			edit.ShowDialog();
 			if (edit.numberOfToken != -1)
+			{
 				(selectedShape as Circle).model.tokens = (uint)edit.numberOfToken;
-			this.Invalidate();
+				this.Invalidate();
+			}
 		}
 
+		/// <summary>
+		/// Редактировать вес для выбранного объекта Line
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		/// <returns>Успешность редактирования</returns>
 		private void tsmEditWeight_Click(object sender, EventArgs e)
 		{
 			try
@@ -411,6 +589,11 @@ namespace PetriNets
 		}
 		#endregion
 
+		/// <summary>
+		/// Метод сохранения построенной Сети Петри
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void Save_Click(object sender, EventArgs e)
 		{
 			SaveFileDialog saveFileDialog = new SaveFileDialog();
@@ -430,6 +613,11 @@ namespace PetriNets
 			}
 		}
 
+		/// <summary>
+		/// Метод сохраненной сети Петри
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void Open_Click(object sender, EventArgs e)
 		{
 			OpenFileDialog op = new OpenFileDialog();
@@ -454,37 +642,78 @@ namespace PetriNets
 			Refresh();
 		}
 
+		/// <summary>
+		/// Включение режима выполнения и
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void bindingNavigatorMoveNextItem_Click(object sender, EventArgs e)
 		{
 			isEvaluating = true;
 			PetriNetsClassLibrary.PetriNet.setRule();
 			Cursor = Cursors.Cross;
+			Graphics g = this.CreateGraphics();
 			foreach(var rectangle in rectangles)
 			{
-				rectangle.selectRectangle(this.CreateGraphics());
+				rectangle.selectRectangle(g);
 			}
+			g.Dispose();
 			this.Invalidate();
 		}
 
+		/// <summary>
+		/// Закончить выполнение сети
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void stop_Click(object sender, EventArgs e)
 		{
 			isEvaluating = false;
 			this.Invalidate();
 			Cursor = Cursors.Default;
 		}
+
+		private void bindingNavigatorMoveFirstItem_Click(object sender, EventArgs e)
+		{
+
+		}
 	}
 
 
+	/// <summary>
+	/// Класс для визуального представления MPlace
+	/// </summary>
 	[Serializable]
 	public class Circle : IShape, INotArch
 	{
+		/// <summary>
+		/// Шрифт для написания количества токенов в объекте MPlace связаного с этим объектом
+		/// </summary>
 		SerializableFont font = new SerializableFont("Arial", GraphicsUnit.Pixel, 12, FontStyle.Regular);
 
+		/// <summary>
+		/// Дефолтный цвет фигуры
+		/// </summary>
 		private Color DefaultColor = ControlPaint.Light(Color.Red);
+		/// <summary>
+		/// Цвет фигуры при выделении
+		/// </summary>
 		private Color SelectedColor = Color.Green;
+		/// <summary>
+		/// Радиус для рисования токена
+		/// </summary>
 		private int TokenRadius = 3;
+		/// <summary>
+		/// Смещения для рисования токенов внутри объкта Circe
+		/// </summary>
 		private Point[] offsets;
 
+		/// <summary>
+		/// Конструктор на основании Центра, Радиуса и наимнеования
+		/// </summary>
+		/// <param name="_Center">Место где будет центр рисуемого объекта</param>
+		/// <param name="_Radious">Радиус объекта</param>
+		/// <param name="labelText">наименование</param>
 		public Circle(Point _Center, int _Radious, string labelText)
 		{
 			FillColor = ControlPaint.Light(Color.Red);
@@ -495,13 +724,35 @@ namespace PetriNets
 			model = new MPlace(labelText);
 			fillOfssets();
 		}
+		/// <summary>
+		/// Соответсвующая визуальному представлению модель MPlace
+		/// </summary>
 		public MPlace model;
+		/// <summary>
+		/// Линии принадлежащих объекту
+		/// </summary>
 		public List<Line> inLines { get; set; }
+		/// <summary>
+		/// Наименование
+		/// </summary>
 		public Label label { get; set; }
+		/// <summary>
+		/// Цвет заполнения фигуры
+		/// </summary>
 		public Color FillColor { get; set; }
+		/// <summary>
+		/// Центр фигуры
+		/// </summary>
 		public Point Center { get; set; }
+		/// <summary>
+		/// Радиус фигуры
+		/// </summary>
 		public int Radious { get; set; }
 		#region select, draw, move
+		/// <summary>
+		/// Построение GraphicsPath для объекта Circle в виде эллипса 
+		/// </summary>
+		/// <returns>полученый GraphicsPath</returns>
 		public GraphicsPath GetPath()
 		{
 			var path = new GraphicsPath();
@@ -510,6 +761,11 @@ namespace PetriNets
 			path.AddEllipse(p.X, p.Y, 2 * Radious, 2 * Radious);
 			return path;
 		}
+		/// <summary>
+		/// Проверка попадания точки в построенный GraphicsPath для объекта Circle
+		/// </summary>
+		/// <param name="p">Точка для которой проверяется попадание</param>
+		/// <returns></returns>
 		public bool HitTest(Point p)
 		{
 			var result = false;
@@ -517,6 +773,10 @@ namespace PetriNets
 				result = path.IsVisible(p);
 			return result || label.HitTest(p);
 		}
+		/// <summary>
+		/// Метод отрисовки объекта
+		/// </summary>
+		/// <param name="g">Место отрисовки</param>
 		public void Draw(Graphics g)
 		{
 			using (var path = GetPath())
@@ -525,6 +785,11 @@ namespace PetriNets
 			label.Draw(g);
 			drawToken(g,(int)model.tokens);
 		}
+		/// <summary>
+		/// Метод вызываемый при событии onMouseMove. 
+		/// Устанавливает новые координаты центра, поэтому при onPaint перемещается
+		/// </summary>
+		/// <param name="d"></param>
 		public void Move(Point d)
 		{
 			Center = new Point(Center.X + d.X, Center.Y + d.Y);
@@ -538,22 +803,45 @@ namespace PetriNets
 		#endregion
 
 		#region IShape other methods
+		/// <summary>
+		/// Переименовать объект Circle
+		/// </summary>
+		/// <param name="newName">новое наименование</param>
 		public void RenameLabel(string newName)
 		{
 			this.label.Text = newName;
 		}
-		public void ChangeColor()
+		/// <summary>
+		/// Поменять цвет на цвет выделения
+		/// </summary>
+		public void Select()
 		{
-			if (FillColor == DefaultColor)
-				FillColor = SelectedColor;
-			else
-				FillColor = DefaultColor;
+			FillColor = SelectedColor;
 		}
+		/// <summary>
+		/// Поменять цвет на дефолтный
+		/// </summary>
+		public void Unselect()
+		{
+			FillColor = DefaultColor;
+		}
+		/// <summary>
+		/// Получить центр фигуры
+		/// </summary>
+		/// <returns>Центр фигуры</returns>
 		public Point getCenter()
 		{
 			return Center;
 		}
+		/// <summary>
+		/// Получить линии связанные с объектом
+		/// </summary>
+		/// <returns>Список связанных линий</returns>
 		public List<Line> getLines() { return inLines; }
+		/// <summary>
+		/// Удалить фигуру из данного массива объектов типа IShape. А так же удаляет все зависимости из модели
+		/// </summary>
+		/// <param name="shapes">массива объектов типа IShape</param>
 		public void delete(List<IShape> shapes)
 		{
 			shapes.Remove(this);
@@ -575,9 +863,15 @@ namespace PetriNets
 				shapes.Remove(line);
 			}
 		}
-		private void deleteReference(MArc arc, List<MArc> arcs)
+		/// <summary>
+		/// Метод удаления зависимостей из данного листа объекто типа MArc
+		/// </summary>
+		/// <param name="arc">арка с объекто MPlace для которого удаляем зависимость</param>
+		/// <param name="arcs">Список откдуа удаляем зависимость</param>
+		/// <returns>Результат удаления</returns>
+		private bool deleteReference(MArc arc, List<MArc> arcs)
 		{
-			PetriNetsClassLibrary.PetriNet.CTransition.removeLink(arc, arcs);
+			return PetriNetsClassLibrary.PetriNet.CTransition.removeLink(arc, arcs);
 		}
 		#endregion
 
@@ -612,12 +906,29 @@ namespace PetriNets
 
 	}
 
+
+	/// <summary>
+	/// Класс для визуального представления MTransition
+	/// </summary>
 	[Serializable]
 	public class TRectangle : IShape, INotArch
 	{
+		/// <summary>
+		/// Цвет рисования
+		/// </summary>
 		private Color DefaultColor = ControlPaint.Light(Color.DarkBlue);
+		/// <summary>
+		/// Цвет выделения
+		/// </summary>
 		private Color SelectedColor = Color.Green;
 
+		/// <summary>
+		/// Конструктор нового объекта TRectangle с известным местоположением и габаритами
+		/// </summary>
+		/// <param name="_Center">Центр-Позиция рисования</param>
+		/// <param name="_height">Выоста</param>
+		/// <param name="_width">Ширина</param>
+		/// <param name="labelText">наименование</param>
 		public TRectangle(Point _Center, int _height, int _width, string labelText)
 		{
 			FillColor = ControlPaint.Light(Color.DarkBlue);
@@ -629,13 +940,38 @@ namespace PetriNets
 			model = new MTransition(labelText);
 			PetriNetsClassLibrary.PetriNet.CTransition.allTransition.Add(model);
 		}
+		/// <summary>
+		/// Модель MTransition соответствующая этому объекту TRectangle
+		/// </summary>
 		public MTransition model;
+		/// <summary>
+		/// Все зависимые от этого объекта линии
+		/// </summary>
 		public List<Line> inLines { get; set; }
+		/// <summary>
+		/// наименование
+		/// </summary>
 		public Label label { get; set; }
+		/// <summary>
+		/// Выбранный цвет заполнения
+		/// </summary>
 		public Color FillColor { get; set; }
+		/// <summary>
+		/// Центр фигуры
+		/// </summary>
 		public Point Center { get; set; }
+		/// <summary>
+		/// Высота фигуры
+		/// </summary>
 		public int height { get; set; }
+		/// <summary>
+		/// Ширина фигуры
+		/// </summary>
 		public int width { get; set; }
+		/// <summary>
+		/// Получить объект GraphicsPath формы Прямоугольника
+		/// </summary>
+		/// <returns>объект GraphicsPath формы Прямоугольника</returns>
 		public GraphicsPath GetPath()
 		{
 			var path = new GraphicsPath();
@@ -644,7 +980,11 @@ namespace PetriNets
 			path.AddRectangle(new Rectangle(p.X, p.Y, width, height));
 			return path;
 		}
-
+		/// <summary>
+		/// Проверка попадания точки в контур GraphicsPath
+		/// </summary>
+		/// <param name="p">проверяемая точка</param>
+		/// <returns>Результат попадания</returns>
 		public bool HitTest(Point p)
 		{
 			var result = false;
@@ -652,6 +992,10 @@ namespace PetriNets
 				result = path.IsVisible(p);
 			return result || label.HitTest(p);
 		}
+		/// <summary>
+		/// Рисование контура GraphicsPath
+		/// </summary>
+		/// <param name="g">Место для рисования</param>
 		public void Draw(Graphics g)
 		{
 			using (var path = GetPath())
@@ -659,6 +1003,10 @@ namespace PetriNets
 				g.FillPath(brush, path);
 			label.Draw(g);
 		}
+		/// <summary>
+		/// Метод для имитации передвижения объекта. Замена старого местоположения на новое
+		/// </summary>
+		/// <param name="d">Смещение относительно старой позиции</param>
 		public void Move(Point d)
 		{
 			Center = new Point(Center.X + d.X, Center.Y + d.Y);
@@ -669,21 +1017,44 @@ namespace PetriNets
 				else { line.Resize(d); }
 			}
 		}
+		/// <summary>
+		/// Переименовать объект
+		/// </summary>
+		/// <param name="newName"></param>
 		public void RenameLabel(string newName)
 		{
 			this.label.Text = newName;
 		}
-		public void ChangeColor()
+		/// <summary>
+		/// Поменять цвет объекта на SelectedColor
+		/// </summary>
+		public void Select()
 		{
-			if (FillColor == DefaultColor)
-				FillColor = SelectedColor;
-			else
-				FillColor = DefaultColor;
+			FillColor = SelectedColor;
 		}
+		/// <summary>
+		/// Поменять цвет объекта на DefaultColor
+		/// </summary>
+		public void Unselect()
+		{
+			FillColor = DefaultColor;
+		}
+		/// <summary>
+		/// Получить позицию центра фигуры
+		/// </summary>
+		/// <returns>позиция центра фигуры</returns>
 		public Point getCenter() { return Center; }
 
+		/// <summary>
+		/// Получить все зависимые от объекта TRectangle линии
+		/// </summary>
+		/// <returns>все зависимые от объекта линии</returns>
 		public List<Line> getLines() { return inLines; }
 
+		/// <summary>
+		/// Удалить из указаного листа IShape текущий объект типа TRectangle
+		/// </summary>
+		/// <param name="shapes"></param>
 		public void delete(List<IShape> shapes)
 		{
 			foreach (var line in inLines)
@@ -703,6 +1074,10 @@ namespace PetriNets
 			shapes.Remove(this);
 		}
 
+		/// <summary>
+		/// Метод выделения объекта Rectangle для режима выполнения сетей петри
+		/// </summary>
+		/// <param name="g"></param>
 		public void selectRectangle(Graphics g)
 		{
 			Pen pen;
@@ -714,24 +1089,71 @@ namespace PetriNets
 		}
 	}
 
+	/// <summary>
+	/// Класс для визуального представления MArc
+	/// </summary>
 	[Serializable]
 	public class Line : IShape
 	{
+		/// <summary>
+		/// Цвет рисования
+		/// </summary>
+		private Color DefaultColor = Color.Black;
+		/// <summary>
+		/// Цвет выделения
+		/// </summary>
+		private Color SelectedColor = Color.Green;
+		/// <summary>
+		/// Конструктор выставляющий по дефолту некоторые переменные
+		/// </summary>
 		public Line() { LineWidth = 2; LineColor = Color.Black; points = new List<PointF>(); mArc = new MArc(); }
+		/// <summary>
+		/// Шрифт для рисования некоторых подсказок на линии
+		/// </summary>
 		SerializableFont font = new SerializableFont("Arial", GraphicsUnit.Pixel, 12, FontStyle.Regular);
+		/// <summary>
+		/// Фигура к которой линия зацепилась в начале
+		/// </summary>
 		public IShape startShape { get; set; }
+		/// <summary>
+		/// Фигура к которой линия зацепилась в конце
+		/// </summary>
 		public IShape endShape { get; set; }
+		/// <summary>
+		/// Ширина рисуемой линии
+		/// </summary>
 		public int LineWidth { get; set; }
+		/// <summary>
+		/// Цвет линии
+		/// </summary>
 		public Color LineColor { get; set; }
+		/// <summary>
+		/// Масив точек для отрисовки кривой
+		/// </summary>
 		public List<PointF> points { get; set; }
+		/// <summary>
+		/// Соответсвующий объекту Line объект mArc 
+		/// </summary>
 		public MArc mArc;
+		/// <summary>
+		/// Соответсвующий объекту Line объект edge
+		/// </summary>
 		public Edge edge;
+		/// <summary>
+		/// Получить GraphicsPath для кривой
+		/// </summary>
+		/// <returns></returns>
 		public GraphicsPath GetPath()
 		{
 			var path = new GraphicsPath();
 			path.AddCurve(points.ToArray());
 			return path;
 		}
+		/// <summary>
+		/// Проверка попадания точки в GraphicsPath построенный по points
+		/// </summary>
+		/// <param name="p">Проверяемая точка</param>
+		/// <returns>Результат попадания</returns>
 		public bool HitTest(Point p)
 		{
 			var result = false;
@@ -740,6 +1162,10 @@ namespace PetriNets
 				result = path.IsOutlineVisible(p, pen);
 			return result;
 		}
+		/// <summary>
+		/// Отрисовка кривой по точкам points
+		/// </summary>
+		/// <param name="g">место для отрисовки</param>
 		public void Draw(Graphics g)
 		{
 			var pen = new Pen(LineColor, LineWidth + 2);
@@ -747,19 +1173,27 @@ namespace PetriNets
 			using (var path = GetPath())
 			{
 				g.DrawPath(pen, path);
+				//Подскаска о конце линии
 				g.DrawString("in", font.ToFont(), Brushes.Brown, points[points.Count-1].X - 40 , points[points.Count - 1].Y - 20);
+				//Подсказска о весе линии
 				g.DrawString(String.Format("[{0}]", mArc.weight), font.ToFont(), Brushes.Brown, points[(points.Count - 1)/2].X, points[(points.Count - 1) / 2].Y + 20);
 			}
 		}
 		public void Move(Point d)
 		{
 		}
-
+		/// <summary>
+		/// Изменение размера линии путем замены последнего поинта в массиве точек points для кривой
+		/// </summary>
+		/// <param name="d">отклонение от последней точки</param>
 		public void Resize(Point d)
 		{
 			points[points.Count - 1] = new PointF(points[points.Count - 1].X + d.X, points[points.Count - 1].Y + d.Y);
 		}
-
+		/// <summary>
+		/// Изменение размера линии путем замены первого поинта в массиве точек points для кривой
+		/// </summary>
+		/// <param name="d">отклонение от первой точки точки</param>
 		public void ResizeStart(Point d)
 		{
 			points[0] = new PointF(points[0].X + d.X, points[0].Y + d.Y);
@@ -767,12 +1201,33 @@ namespace PetriNets
 
 		public void RenameLabel(string newName) { }
 
-		public void ChangeColor() { }
-
+		/// <summary>
+		/// Изменение цвета и ширины для режима Select
+		/// </summary>
+		public void Select() {
+			LineColor = SelectedColor;
+			LineWidth = 4;
+		}
+		/// <summary>
+		/// Изменение цвета и ширины для режима Unselect
+		/// </summary>
+		public void Unselect()
+		{
+			LineColor = DefaultColor;
+			LineWidth = 2;
+		}
+		/// <summary>
+		/// Получить местоположение центра фигуры
+		/// </summary>
+		/// <returns>Point.Empty</returns>
 		public Point getCenter() { return Point.Empty; }
 
 		public PointF getEdge(Point curLocation) { return PointF.Empty; }
 
+		/// <summary>
+		/// Удалить объект Line со всеми его зависимостями из листа IShape
+		/// </summary>
+		/// <param name="shapes">лист откуда удаляем</param>
 		public void delete(List<IShape> shapes)
 		{
 			Circle circle;
@@ -789,6 +1244,9 @@ namespace PetriNets
 
 	}
 
+	/// <summary>
+	/// Класс для изображения наименования объекта
+	/// </summary>
 	[Serializable]
 	public class Label
 	{
@@ -861,7 +1319,8 @@ namespace PetriNets
 		void Draw(Graphics g);
 		void Move(Point d);
 		void RenameLabel(string newName);
-		void ChangeColor();
+		void Select();
+		void Unselect();
 		Point getCenter();
 		void delete(List<IShape> shapes);
 	}

@@ -33,7 +33,6 @@
 			this.bindingNavigator1 = new System.Windows.Forms.BindingNavigator(this.components);
 			this.bindingNavigatorMoveFirstItem = new System.Windows.Forms.ToolStripButton();
 			this.pause = new System.Windows.Forms.ToolStripButton();
-			this.stop = new System.Windows.Forms.ToolStripButton();
 			this.bindingNavigatorMoveLastItem = new System.Windows.Forms.ToolStripButton();
 			this.bindingNavigatorSeparator2 = new System.Windows.Forms.ToolStripSeparator();
 			this.circle = new System.Windows.Forms.ToolStripButton();
@@ -44,6 +43,7 @@
 			this.Save = new System.Windows.Forms.ToolStripButton();
 			this.Open = new System.Windows.Forms.ToolStripButton();
 			this.btPlay = new System.Windows.Forms.ToolStripButton();
+			this.stop = new System.Windows.Forms.ToolStripButton();
 			this.tbEdit = new System.Windows.Forms.ToolStripMenuItem();
 			this.cmPlace = new System.Windows.Forms.ContextMenuStrip(this.components);
 			this.editNumberOfTokens = new System.Windows.Forms.ToolStripMenuItem();
@@ -103,6 +103,7 @@
 			this.bindingNavigatorMoveFirstItem.RightToLeftAutoMirrorImage = true;
 			this.bindingNavigatorMoveFirstItem.Size = new System.Drawing.Size(23, 22);
 			this.bindingNavigatorMoveFirstItem.Text = "Переместить в начало";
+			this.bindingNavigatorMoveFirstItem.Click += new System.EventHandler(this.bindingNavigatorMoveFirstItem_Click);
 			// 
 			// pause
 			// 
@@ -112,16 +113,6 @@
 			this.pause.Name = "pause";
 			this.pause.Size = new System.Drawing.Size(23, 22);
 			this.pause.Text = "toolStripButton1";
-			// 
-			// stop
-			// 
-			this.stop.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.stop.Image = global::PetriNets.Properties.Resources.stop;
-			this.stop.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.stop.Name = "stop";
-			this.stop.Size = new System.Drawing.Size(23, 22);
-			this.stop.Text = "toolStripButton2";
-			this.stop.Click += new System.EventHandler(this.stop_Click);
 			// 
 			// bindingNavigatorMoveLastItem
 			// 
@@ -216,6 +207,16 @@
 			this.btPlay.Size = new System.Drawing.Size(23, 22);
 			this.btPlay.Text = "toolStripButton3";
 			this.btPlay.Click += new System.EventHandler(this.bindingNavigatorMoveNextItem_Click);
+			// 
+			// stop
+			// 
+			this.stop.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.stop.Image = global::PetriNets.Properties.Resources.stop;
+			this.stop.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.stop.Name = "stop";
+			this.stop.Size = new System.Drawing.Size(23, 22);
+			this.stop.Text = "toolStripButton2";
+			this.stop.Click += new System.EventHandler(this.stop_Click);
 			// 
 			// tbEdit
 			// 
