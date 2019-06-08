@@ -43,8 +43,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CArc.cs" />
-    <Compile Include="CPlace.cs" />
     <Compile Include="CTransition.cs" />
     <Compile Include="Edge.cs" />
     <Compile Include="MArc.cs" />
