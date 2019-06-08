@@ -438,7 +438,8 @@ namespace PetriNets
 		/// <param name="location">точка для добавления</param>
 		private void resizingLine(Point location)
 		{
-			curLine.points.Add(location);
+			if(selectedShape == null)
+				curLine.points.Add(location);
 			if (selectedShape != null)
 			{
 
@@ -453,6 +454,8 @@ namespace PetriNets
 					curLine = null;
 					return;
 				}
+				curLine.points.RemoveAt(curLine.points.Count - 1);
+				curLine.points.Add((selectedShape as INotArch).getClosestEdge(location));
 				(selectedShape as INotArch).getLines().Add(curLine);
 				selectedShape.Unselect();
 				selectedShape = null;
@@ -904,6 +907,14 @@ namespace PetriNets
 		}
 		#endregion
 
+		public PointF getClosestEdge(Point Location)
+		{
+			float sqrt = (float)Math.Sqrt(Math.Pow(Location.X - Center.X, 2) + Math.Pow(Location.Y - Center.Y, 2));
+			float cx = Center.X + Radious * (Location.X - Center.X) / sqrt;
+			float cy = Center.Y + Radious * (Location.Y - Center.Y) / sqrt;
+			return new PointF(cx, cy);
+		}
+
 	}
 
 
@@ -1001,6 +1012,10 @@ namespace PetriNets
 			using (var path = GetPath())
 			using (var brush = new SolidBrush(FillColor))
 				g.FillPath(brush, path);
+			//var bounds = GetPath().GetBounds();
+			//g.DrawLine(Pens.Black, new Point((int)bounds.Left - 10, Center.Y + height / 2), new Point((int)bounds.Left - 10, Center.Y - height / 2));
+			//var pos = getLineEquation(new Point((int)bounds.Left - 10, Center.Y + height / 2), new Point((int)bounds.Left - 10, Center.Y - height / 2), new Point(Center.X, Center.Y));
+			//g.DrawEllipse(Pens.Black, pos.X,pos.Y, 5, 5);
 			label.Draw(g);
 		}
 		/// <summary>
@@ -1086,6 +1101,48 @@ namespace PetriNets
 			else pen = new Pen(Brushes.Red, 10);
 			using (var path = GetPath())
 				g.DrawPath(pen, path);
+		}
+
+		public PointF getClosestEdge(Point Location)
+		{
+			var bounds = GetPath().GetBounds();
+			double d1, d2, d3, d4;
+			var leftClosest = getLineEquation(new Point((int)bounds.Left, Center.Y + height / 2), 
+											  new Point((int)bounds.Left, Center.Y - height / 2), 
+											  Location, out d1);
+			var rightClosest = getLineEquation(new Point((int)bounds.Right, Center.Y + height / 2),
+											  new Point((int)bounds.Right, Center.Y - height / 2),
+											  Location, out d2);
+			var bottomClosest = getLineEquation(new Point(Center.X + width/2, (int)bounds.Bottom),
+											  new Point(Center.X - width / 2, (int)bounds.Bottom),
+											  Location, out d3);
+			var topClosest = getLineEquation(new Point(Center.X + width / 2, (int)bounds.Top),
+											  new Point(Center.X - width / 2, (int)bounds.Top),
+											  Location, out d4);
+			var minDistance = (new double[4] { d1, d2, d3, d4 }).Min();
+			if (minDistance == d1)
+				return leftClosest;
+			if (minDistance == d2)
+				return rightClosest;
+			if (minDistance == d3)
+				return bottomClosest;
+			if (minDistance == d4)
+				return topClosest;
+			return PointF.Empty;
+		}
+		
+		
+		private PointF getLineEquation(Point edgeStart, Point edgeEnd, Point p, out double distance)
+		{
+			var A = edgeStart.Y - edgeEnd.Y;
+			var B = edgeEnd.X - edgeStart.X;
+			var C = edgeStart.X * edgeEnd.Y - edgeEnd.X * edgeStart.Y;
+			var ab = A * A + B * B;
+			float cx = (float)((B * B * p.X - A * (B * p.Y + C)) / ab);
+			float cy = (float)((A*A * p.Y - B * (B * p.X + C)) / ab);
+			var levelRatio = A * (p.Y - edgeStart.Y) + B * (edgeStart.X - p.X) / ab;
+			distance = Math.Abs(A*p.X + B*p.Y + C) / ab;
+			return new PointF(cx, cy);
 		}
 	}
 
@@ -1328,6 +1385,7 @@ namespace PetriNets
 	public interface INotArch
 	{
 		List<Line> getLines();
+		PointF getClosestEdge(Point Location);
 	}
 
 	public abstract class Shape
