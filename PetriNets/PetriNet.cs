@@ -907,6 +907,11 @@ namespace PetriNets
 		}
 		#endregion
 
+		/// <summary>
+		/// Метод получения ближайшей точки границы объекта Circle относительно переденаной точки
+		/// </summary>
+		/// <param name="Location">Поиск ближайшей точки относительно этой точки</param>
+		/// <returns>Ближайшая точка на границе</returns>
 		public PointF getClosestEdge(Point Location)
 		{
 			float sqrt = (float)Math.Sqrt(Math.Pow(Location.X - Center.X, 2) + Math.Pow(Location.Y - Center.Y, 2));
@@ -1103,21 +1108,26 @@ namespace PetriNets
 				g.DrawPath(pen, path);
 		}
 
+		/// <summary>
+		/// Метод получения ближайшей точки границы объекта TRectangle относительно переденаной точки
+		/// </summary>
+		/// <param name="Location">Поиск относительно этой точки</param>
+		/// <returns>Ближайшая точка на границе</returns>
 		public PointF getClosestEdge(Point Location)
 		{
 			var bounds = GetPath().GetBounds();
-			double d1, d2, d3, d4;
-			var leftClosest = getLineEquation(new Point((int)bounds.Left, Center.Y + height / 2), 
-											  new Point((int)bounds.Left, Center.Y - height / 2), 
+			float d1, d2, d3, d4;
+			var leftClosest = FindClosestPointOnLine(new PointF((int)bounds.Left, Center.Y + height / 2), 
+											  new PointF((int)bounds.Left, Center.Y - height / 2), 
 											  Location, out d1);
-			var rightClosest = getLineEquation(new Point((int)bounds.Right, Center.Y + height / 2),
-											  new Point((int)bounds.Right, Center.Y - height / 2),
+			var rightClosest = FindClosestPointOnLine(new PointF((int)bounds.Right, Center.Y + height / 2),
+											  new PointF((int)bounds.Right, Center.Y - height / 2),
 											  Location, out d2);
-			var bottomClosest = getLineEquation(new Point(Center.X + width/2, (int)bounds.Bottom),
-											  new Point(Center.X - width / 2, (int)bounds.Bottom),
+			var bottomClosest = FindClosestPointOnLine(new PointF(Center.X + width / 2, (int)bounds.Bottom),
+											  new PointF(Center.X - width / 2, (int)bounds.Bottom),
 											  Location, out d3);
-			var topClosest = getLineEquation(new Point(Center.X + width / 2, (int)bounds.Top),
-											  new Point(Center.X - width / 2, (int)bounds.Top),
+			var topClosest = FindClosestPointOnLine(new PointF(Center.X + width / 2, (int)bounds.Top),
+											  new PointF(Center.X - width / 2, (int)bounds.Top),
 											  Location, out d4);
 			var minDistance = (new double[4] { d1, d2, d3, d4 }).Min();
 			if (minDistance == d1)
@@ -1125,23 +1135,30 @@ namespace PetriNets
 			if (minDistance == d2)
 				return rightClosest;
 			if (minDistance == d3)
-				return bottomClosest;
+				return new PointF(bottomClosest.X, bounds.Bottom);
 			if (minDistance == d4)
-				return topClosest;
-			return PointF.Empty;
+				return new PointF(topClosest.X, bounds.Top);
+			return leftClosest;
 		}
 		
-		
-		private PointF getLineEquation(Point edgeStart, Point edgeEnd, Point p, out double distance)
+		/// <summary>
+		/// Поиск ближайшей точки на линии относительно точки вне линии
+		/// </summary>
+		/// <param name="edgeStart">Позиция начала точки</param>
+		/// <param name="edgeEnd">Позиция конца точки</param>
+		/// <param name="p">точка относительно которой происходит поиск</param>
+		/// <param name="distance">Дистанция от точки до линии</param>
+		/// <returns>ближайшая точка</returns>
+		private PointF FindClosestPointOnLine(PointF edgeStart, PointF edgeEnd, PointF p, out float distance)
 		{
 			var A = edgeStart.Y - edgeEnd.Y;
 			var B = edgeEnd.X - edgeStart.X;
 			var C = edgeStart.X * edgeEnd.Y - edgeEnd.X * edgeStart.Y;
 			var ab = A * A + B * B;
-			float cx = (float)((B * B * p.X - A * (B * p.Y + C)) / ab);
-			float cy = (float)((A*A * p.Y - B * (B * p.X + C)) / ab);
-			var levelRatio = A * (p.Y - edgeStart.Y) + B * (edgeStart.X - p.X) / ab;
-			distance = Math.Abs(A*p.X + B*p.Y + C) / ab;
+			float cx = ((B * B * p.X - A * (B * p.Y + C)) / (float)ab);
+			float cy = ((A*A * p.Y - B * (B * p.X + C)) / (float)ab);
+			var levelRatio = (float)A * (float)(p.Y - edgeStart.Y) + (float)B * (float)(edgeStart.X - p.X) / (float)ab;
+			distance = (float)Math.Abs(A*p.X + B*p.Y + C) / (float)ab;
 			return new PointF(cx, cy);
 		}
 	}
