@@ -717,6 +717,21 @@ namespace PetriNets
 			DrawElement = null;
 			this.Cursor = Cursors.Arrow;
 		}
+
+		private void randomFire_Click(object sender, EventArgs e)
+		{
+			if (isEvaluating)
+			{
+				Random random = new Random();
+				if (PetriNetsClassLibrary.PetriNet.CTransition.enabledTransition.Count > 0)
+				{
+					int i = random.Next(0, PetriNetsClassLibrary.PetriNet.CTransition.enabledTransition.Count);
+					PetriNetsClassLibrary.PetriNet.CTransition.fireTransition(PetriNetsClassLibrary.PetriNet.CTransition.enabledTransition[i]);
+					PetriNetsClassLibrary.PetriNet.setRule();
+				}
+				this.Invalidate();
+			}
+		}
 	}
 
 
