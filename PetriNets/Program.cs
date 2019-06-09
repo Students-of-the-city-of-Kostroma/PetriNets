@@ -16,7 +16,8 @@ namespace PetriNets
 		{
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
-			Application.Run();
+
+			Application.Run(new PetriNet());
 		}
 	}
 }
