@@ -68,7 +68,7 @@ namespace PetriNets
 		/// <summary>
 		/// Фигура на форме выбранная в настоящий момент
 		/// </summary>
-		IShape selectedShape;
+		public IShape selectedShape;
 		/// <summary>
 		/// Происходит ли передвижение объектов
 		/// </summary>
@@ -80,7 +80,7 @@ namespace PetriNets
 		/// <summary>
 		/// Текущая линия Line
 		/// </summary>
-		Line curLine;
+		public Line curLine;
 		/// <summary>
 		/// Изменяется ли сейчас линия
 		/// </summary>
@@ -433,7 +433,7 @@ namespace PetriNets
 			for (var i = Shapes.Count - 1; i >= 0; i--)
 				if (Shapes[i].HitTest(location)) { if (!(Shapes[i] is Line)) { selectedShape = Shapes[i]; break; } }
 		}
-		private void hitTestWithLine(Point location)
+		public void hitTestWithLine(Point location)
 		{
 			for (var i = Shapes.Count - 1; i >= 0; i--)
 				if (Shapes[i].HitTest(location)) { { selectedShape = Shapes[i]; break; } }
@@ -897,26 +897,31 @@ namespace PetriNets
 		/// Удалить фигуру из данного массива объектов типа IShape. А так же удаляет все зависимости из модели
 		/// </summary>
 		/// <param name="shapes">массива объектов типа IShape</param>
-		public void delete(List<IShape> shapes)
+		public bool delete(List<IShape> shapes)
 		{
-			shapes.Remove(this);
-			foreach (var line in inLines)
+			try
 			{
-				TRectangle rectangle;
-				if (line.startShape is TRectangle)
+				shapes.Remove(this);
+				foreach (var line in inLines)
 				{
-					rectangle = line.startShape as TRectangle;
-					deleteReference(line.mArc, rectangle.model.inPlaces);
-					rectangle.inLines.Remove(line);
+					TRectangle rectangle;
+					if (line.startShape is TRectangle)
+					{
+						rectangle = line.startShape as TRectangle;
+						deleteReference(line.mArc, rectangle.model.inPlaces);
+						rectangle.inLines.Remove(line);
+					}
+					else if (line.endShape is TRectangle)
+					{
+						rectangle = line.endShape as TRectangle;
+						deleteReference(line.mArc, rectangle.model.outPlaces);
+						rectangle.inLines.Remove(line);
+					}
+					shapes.Remove(line);
 				}
-				else if(line.endShape is TRectangle)
-				{
-					rectangle = line.endShape as TRectangle;
-					deleteReference(line.mArc, rectangle.model.outPlaces);
-					rectangle.inLines.Remove(line);
-				}
-				shapes.Remove(line);
+				return true;
 			}
+			catch { return false; }
 		}
 		/// <summary>
 		/// Метод удаления зависимостей из данного листа объекто типа MArc
@@ -1127,23 +1132,28 @@ namespace PetriNets
 		/// Удалить из указаного листа IShape текущий объект типа TRectangle
 		/// </summary>
 		/// <param name="shapes"></param>
-		public void delete(List<IShape> shapes)
+		public bool delete(List<IShape> shapes)
 		{
-			foreach (var line in inLines)
+			try
 			{
-				Circle circle;
-				if (line.startShape is Circle)
+				foreach (var line in inLines)
 				{
-					circle = line.startShape as Circle;
+					Circle circle;
+					if (line.startShape is Circle)
+					{
+						circle = line.startShape as Circle;
+					}
+					else
+					{
+						circle = line.endShape as Circle;
+					}
+					circle.inLines.Remove(line);
+					shapes.Remove(line);
 				}
-				else
-				{
-					circle = line.endShape as Circle;
-				}
-				circle.inLines.Remove(line);
-				shapes.Remove(line);
+				shapes.Remove(this);
+				return true;
 			}
-			shapes.Remove(this);
+			catch { return false; }
 		}
 
 		/// <summary>
@@ -1376,17 +1386,22 @@ namespace PetriNets
 		/// Удалить объект Line со всеми его зависимостями из листа IShape
 		/// </summary>
 		/// <param name="shapes">лист откуда удаляем</param>
-		public void delete(List<IShape> shapes)
+		public bool delete(List<IShape> shapes)
 		{
-			Circle circle;
-			TRectangle rectangle;
-			List<MArc> lines; 
-			if(this.startShape is Circle) { circle = (Circle)this.startShape; rectangle = (TRectangle)this.endShape; lines = ((TRectangle)this.endShape).model.inPlaces;  }
-			else { circle = (Circle)this.endShape; rectangle = (TRectangle)this.startShape; lines = ((TRectangle)this.startShape).model.outPlaces;  }
-			circle.inLines.Remove(this);
-			PetriNetsClassLibrary.PetriNet.CTransition.removeLink(this.mArc, lines);
-			rectangle.inLines.Remove(this);
-			shapes.Remove(this);
+			try
+			{
+				Circle circle;
+				TRectangle rectangle;
+				List<MArc> lines;
+				if (this.startShape is Circle) { circle = (Circle)this.startShape; rectangle = (TRectangle)this.endShape; lines = ((TRectangle)this.endShape).model.inPlaces; }
+				else { circle = (Circle)this.endShape; rectangle = (TRectangle)this.startShape; lines = ((TRectangle)this.startShape).model.outPlaces; }
+				circle.inLines.Remove(this);
+				PetriNetsClassLibrary.PetriNet.CTransition.removeLink(this.mArc, lines);
+				rectangle.inLines.Remove(this);
+				shapes.Remove(this);
+				return true;
+			}
+			catch { return false; }
 		}
 
 
@@ -1470,7 +1485,7 @@ namespace PetriNets
 		void Select();
 		void Unselect();
 		Point getCenter();
-		void delete(List<IShape> shapes);
+		bool delete(List<IShape> shapes);
 	}
 
 	public interface INotArch
