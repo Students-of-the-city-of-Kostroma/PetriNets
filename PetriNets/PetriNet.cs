@@ -217,8 +217,7 @@ namespace PetriNets
 					}
 					if (isLinening && !resize && selectedShape != null)
 					{
-						//Создание новой линии
-						createNewLine(location);
+						bool l = createNewLine(location);
 					}
 				}
 			}
@@ -342,12 +341,13 @@ namespace PetriNets
 		#endregion
 
 		#region drawing methods
+    
 		/// <summary>
 		/// Рисование объекта Circle по указаной позиции
 		/// </summary>
 		/// <param name="Location">Центр-Позиция для рисования</param>
 		/// <returns></returns>
-		bool DrawCircle(Point Location)
+		public bool DrawCircle(Point Location)
 		{
 			try
 			{
@@ -369,7 +369,7 @@ namespace PetriNets
 		/// </summary>
 		/// <param name="Location">Центр-Позиция для рисования</param>
 		/// <returns></returns>
-		bool DrawRectangle(Point Location)
+		public bool DrawRectangle(Point Location)
 		{
 			try
 			{
@@ -392,7 +392,7 @@ namespace PetriNets
 		/// </summary>
 		/// <param name="location">Позиция</param>
 		/// <returns></returns>
-		private bool createNewLine(Point location)
+		public bool createNewLine(Point location)
 		{
 			if (isInhibitor && selectedShape is TRectangle)
 				return false;
@@ -512,7 +512,7 @@ namespace PetriNets
 		/// </summary>
 		/// <param name="location"></param>
 		/// <returns>Удален ли элемент по указаной позиции</returns>
-		private bool deleteElement(Point location)
+		public bool deleteElement(Point location)
 		{
 			hitTestWithLine(location);
 			if (selectedShape != null)

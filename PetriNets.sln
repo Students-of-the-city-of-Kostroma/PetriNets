@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PetriNetsClassLibrary", "Pe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTestPetriNets", "UnitTestPetriNets\UnitTestPetriNets.csproj", "{FE82DA3F-664D-4289-9864-A57166FD5BED}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PetriNetTests", "PetriNetTests\PetriNetTests.csproj", "{79E867AA-1525-4016-B91D-4BB6B3FDBBA5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{FE82DA3F-664D-4289-9864-A57166FD5BED}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FE82DA3F-664D-4289-9864-A57166FD5BED}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FE82DA3F-664D-4289-9864-A57166FD5BED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{79E867AA-1525-4016-B91D-4BB6B3FDBBA5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{79E867AA-1525-4016-B91D-4BB6B3FDBBA5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{79E867AA-1525-4016-B91D-4BB6B3FDBBA5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{79E867AA-1525-4016-B91D-4BB6B3FDBBA5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
