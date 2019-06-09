@@ -155,5 +155,11 @@
   <ItemGroup>
     <None Include="Resources\Back.png" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Inhibitor Arc.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Arc.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

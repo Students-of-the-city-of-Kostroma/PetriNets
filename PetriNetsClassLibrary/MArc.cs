@@ -13,15 +13,18 @@ namespace PetriNetsClassLibrary
 	public class MArc : Model
 	{
 
+		public bool isInhibitor { get; private set; }
+
 		/// <summary>
 		/// Стандартный конструктор. По умолчанию вес арки - 1
 		/// </summary>
 
 		uint Weight;
 
-		public MArc()
+		public MArc(bool isInhibitor)
 		{
 			Weight = 1;
+			this.isInhibitor = isInhibitor;
 		}
 
 		/// <summary>
@@ -33,7 +36,7 @@ namespace PetriNetsClassLibrary
 		public MArc(MPlace mPlace, MTransition mTransition, bool isIn)
 		{
 			edge = new Edge(mPlace, mTransition, isIn);
-      Weight = 1;
+			 Weight = 1;
 		}
 
 		/// <summary>

@@ -64,7 +64,8 @@ namespace PetriNetsClassLibrary
 
 					foreach (var inArc in transition.inPlaces)
 					{
-						inArc.edge.edge.Item1.tokens = inArc.edge.edge.Item1.tokens - inArc.weight;
+						if(!inArc.isInhibitor)
+							inArc.edge.edge.Item1.tokens = inArc.edge.edge.Item1.tokens - inArc.weight;
 					}
 					foreach (var outArc in transition.outPlaces)
 					{
@@ -92,7 +93,8 @@ namespace PetriNetsClassLibrary
 				transition.isEnable = true;
 				foreach (var inArc in transition.inPlaces)
 				{
-					inArc.edge.edge.Item1.tokens += inArc.weight;
+					if(!inArc.isInhibitor)
+						inArc.edge.edge.Item1.tokens += inArc.weight;
 				}
 				foreach (var outArc in transition.outPlaces)
 				{

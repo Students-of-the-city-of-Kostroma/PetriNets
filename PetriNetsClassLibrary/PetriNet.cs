@@ -34,7 +34,11 @@ namespace PetriNetsClassLibrary
 				{
 					foreach (var arc in transition.inPlaces)
 					{
-						if (arc.edge.edge.Item1.tokens < arc.weight) { isEnable = false; CTransition.enabledTransition.Remove(transition); break; }
+						if(!arc.isInhibitor)
+							if (arc.edge.edge.Item1.tokens < arc.weight)
+							{ isEnable = false; CTransition.enabledTransition.Remove(transition); break; }
+						if(arc.isInhibitor && arc.edge.edge.Item1.tokens > 0)
+						{ isEnable = false; CTransition.enabledTransition.Remove(transition); break; }
 					}
 					transition.isEnable = isEnable;
 					if (isEnable)
