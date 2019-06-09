@@ -55,19 +55,51 @@ namespace PetriNetsClassLibrary
 		/// </summary>
 		/// <param name="transition">переход для входящих и выходящих mPlace которого надо сделать перевод</param>
 		/// <returns>Результат перевода токенов</returns>
-		public bool exchangeTokens(MTransition transition)
+		public bool fireTransition(MTransition transition)
 		{
-			if (transition.isEnable)
+			try
 			{
-				foreach(var inArc in transition.inPlaces) {
-					inArc.edge.edge.Item1.tokens = inArc.edge.edge.Item1.tokens - inArc.weight;
-				}
-				foreach(var outArc in transition.outPlaces)
+				if (transition.isEnable)
 				{
-					outArc.edge.edge.Item1.tokens += outArc.weight;
+
+					foreach (var inArc in transition.inPlaces)
+					{
+						inArc.edge.edge.Item1.tokens = inArc.edge.edge.Item1.tokens - inArc.weight;
+					}
+					foreach (var outArc in transition.outPlaces)
+					{
+						outArc.edge.edge.Item1.tokens += outArc.weight;
+					}
+					PetriNetsClassLibrary.PetriNet.FiredTransitions.Push(transition);
 				}
 			}
+			catch
+			{
+				return false;
+			}
 			return transition.isEnable;
+		}
+
+		public bool unfireTransition()
+		{
+			try {
+				var transition = PetriNetsClassLibrary.PetriNet.FiredTransitions.Pop();
+
+				transition.isEnable = true;
+				foreach (var inArc in transition.inPlaces)
+				{
+					inArc.edge.edge.Item1.tokens += inArc.weight;
+				}
+				foreach (var outArc in transition.outPlaces)
+				{
+					outArc.edge.edge.Item1.tokens -= outArc.weight;
+				}
+				return true;
+			}
+			catch
+			{
+				return false;
+			}
 		}
 
 	}

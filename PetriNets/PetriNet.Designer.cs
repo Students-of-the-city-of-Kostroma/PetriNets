@@ -29,11 +29,7 @@
 		private void InitializeComponent()
 		{
 			this.components = new System.ComponentModel.Container();
-			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(PetriNet));
 			this.bindingNavigator1 = new System.Windows.Forms.BindingNavigator(this.components);
-			this.bindingNavigatorMoveFirstItem = new System.Windows.Forms.ToolStripButton();
-			this.pause = new System.Windows.Forms.ToolStripButton();
-			this.bindingNavigatorMoveLastItem = new System.Windows.Forms.ToolStripButton();
 			this.bindingNavigatorSeparator2 = new System.Windows.Forms.ToolStripSeparator();
 			this.circle = new System.Windows.Forms.ToolStripButton();
 			this.rectangle = new System.Windows.Forms.ToolStripButton();
@@ -42,8 +38,10 @@
 			this.toolStripButton2 = new System.Windows.Forms.ToolStripButton();
 			this.Save = new System.Windows.Forms.ToolStripButton();
 			this.Open = new System.Windows.Forms.ToolStripButton();
+			this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
 			this.btPlay = new System.Windows.Forms.ToolStripButton();
 			this.stop = new System.Windows.Forms.ToolStripButton();
+			this.back = new System.Windows.Forms.ToolStripButton();
 			this.tbEdit = new System.Windows.Forms.ToolStripMenuItem();
 			this.cmPlace = new System.Windows.Forms.ContextMenuStrip(this.components);
 			this.editNumberOfTokens = new System.Windows.Forms.ToolStripMenuItem();
@@ -71,9 +69,6 @@
 			this.bindingNavigator1.CountItem = null;
 			this.bindingNavigator1.DeleteItem = null;
 			this.bindingNavigator1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.bindingNavigatorMoveFirstItem,
-            this.pause,
-            this.bindingNavigatorMoveLastItem,
             this.bindingNavigatorSeparator2,
             this.circle,
             this.rectangle,
@@ -82,11 +77,13 @@
             this.toolStripButton2,
             this.Save,
             this.Open,
+            this.toolStripSeparator4,
             this.btPlay,
-            this.stop});
+            this.stop,
+            this.back});
 			this.bindingNavigator1.Location = new System.Drawing.Point(0, 0);
-			this.bindingNavigator1.MoveFirstItem = this.bindingNavigatorMoveFirstItem;
-			this.bindingNavigator1.MoveLastItem = this.bindingNavigatorMoveLastItem;
+			this.bindingNavigator1.MoveFirstItem = null;
+			this.bindingNavigator1.MoveLastItem = null;
 			this.bindingNavigator1.MoveNextItem = null;
 			this.bindingNavigator1.MovePreviousItem = null;
 			this.bindingNavigator1.Name = "bindingNavigator1";
@@ -94,34 +91,6 @@
 			this.bindingNavigator1.Size = new System.Drawing.Size(800, 25);
 			this.bindingNavigator1.TabIndex = 0;
 			this.bindingNavigator1.Text = "bindingNavigator1";
-			// 
-			// bindingNavigatorMoveFirstItem
-			// 
-			this.bindingNavigatorMoveFirstItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.bindingNavigatorMoveFirstItem.Image = ((System.Drawing.Image)(resources.GetObject("bindingNavigatorMoveFirstItem.Image")));
-			this.bindingNavigatorMoveFirstItem.Name = "bindingNavigatorMoveFirstItem";
-			this.bindingNavigatorMoveFirstItem.RightToLeftAutoMirrorImage = true;
-			this.bindingNavigatorMoveFirstItem.Size = new System.Drawing.Size(23, 22);
-			this.bindingNavigatorMoveFirstItem.Text = "Переместить в начало";
-			this.bindingNavigatorMoveFirstItem.Click += new System.EventHandler(this.bindingNavigatorMoveFirstItem_Click);
-			// 
-			// pause
-			// 
-			this.pause.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.pause.Image = global::PetriNets.Properties.Resources.pause;
-			this.pause.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.pause.Name = "pause";
-			this.pause.Size = new System.Drawing.Size(23, 22);
-			this.pause.Text = "toolStripButton1";
-			// 
-			// bindingNavigatorMoveLastItem
-			// 
-			this.bindingNavigatorMoveLastItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.bindingNavigatorMoveLastItem.Image = ((System.Drawing.Image)(resources.GetObject("bindingNavigatorMoveLastItem.Image")));
-			this.bindingNavigatorMoveLastItem.Name = "bindingNavigatorMoveLastItem";
-			this.bindingNavigatorMoveLastItem.RightToLeftAutoMirrorImage = true;
-			this.bindingNavigatorMoveLastItem.Size = new System.Drawing.Size(23, 22);
-			this.bindingNavigatorMoveLastItem.Text = "Переместить в конец";
 			// 
 			// bindingNavigatorSeparator2
 			// 
@@ -198,6 +167,11 @@
 			this.Open.Text = "toolStripButton3";
 			this.Open.Click += new System.EventHandler(this.Open_Click);
 			// 
+			// toolStripSeparator4
+			// 
+			this.toolStripSeparator4.Name = "toolStripSeparator4";
+			this.toolStripSeparator4.Size = new System.Drawing.Size(6, 25);
+			// 
 			// btPlay
 			// 
 			this.btPlay.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
@@ -217,6 +191,17 @@
 			this.stop.Size = new System.Drawing.Size(23, 22);
 			this.stop.Text = "toolStripButton2";
 			this.stop.Click += new System.EventHandler(this.stop_Click);
+			// 
+			// back
+			// 
+			this.back.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.back.Enabled = false;
+			this.back.Image = global::PetriNets.Properties.Resources.Back;
+			this.back.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.back.Name = "back";
+			this.back.Size = new System.Drawing.Size(23, 22);
+			this.back.Text = "toolStripButton3";
+			this.back.Click += new System.EventHandler(this.back_Click);
 			// 
 			// tbEdit
 			// 
@@ -340,13 +325,10 @@
 		#endregion
 
 		private System.Windows.Forms.BindingNavigator bindingNavigator1;
-		private System.Windows.Forms.ToolStripButton bindingNavigatorMoveFirstItem;
-		private System.Windows.Forms.ToolStripButton bindingNavigatorMoveLastItem;
 		private System.Windows.Forms.ToolStripSeparator bindingNavigatorSeparator2;
 		private System.Windows.Forms.ToolStripButton circle;
 		private System.Windows.Forms.ToolStripButton rectangle;
 		private System.Windows.Forms.ToolStripButton line;
-		private System.Windows.Forms.ToolStripButton pause;
 		private System.Windows.Forms.ToolStripButton stop;
 		private System.Windows.Forms.ToolStripButton toolStripButton1;
 		private System.Windows.Forms.ToolStripButton toolStripButton2;
@@ -367,5 +349,7 @@
 		private System.Windows.Forms.ToolStripButton Open;
 		private System.Windows.Forms.OpenFileDialog openFileDialog1;
 		private System.Windows.Forms.ToolStripButton btPlay;
+		private System.Windows.Forms.ToolStripButton back;
+		private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
 	}
 }

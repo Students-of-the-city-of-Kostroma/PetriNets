@@ -146,5 +146,14 @@
   <ItemGroup>
     <None Include="Resources\Animation mode.png" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\forward.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Forward.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Back.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
