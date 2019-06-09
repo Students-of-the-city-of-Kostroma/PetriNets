@@ -4,14 +4,27 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+/// <summary>
+/// Общий класс для хранения контроллера CTransition и выполнения некоторых операция над сетью петри
+/// </summary>
 namespace PetriNetsClassLibrary
 {
 	public static class PetriNet
 	{
-		public static CArc cArc = new CArc();
+		/// <summary>
+		/// Контроллер CTransition
+		/// </summary>
 		public static CTransition CTransition = new CTransition();
-		public static CPlace CPlace = new CPlace();
 
+		/// <summary>
+		/// Стэк для хранения выстрельнутых переходов MTransition 
+		/// </summary>
+		public static Stack<MTransition> FiredTransitions = new Stack<MTransition>();
+
+		/// <summary>
+		/// Метод устанавливающий поле isEnable для всех переходов MTransition из CTransition.
+		/// А так же записывающий включеные переход MTransition
+		/// </summary>
 		public static void setRule()
 		{
 			bool isEnable = true;
@@ -21,7 +34,11 @@ namespace PetriNetsClassLibrary
 				{
 					foreach (var arc in transition.inPlaces)
 					{
-						if (arc.edge.edge.Item1.tokens < arc.weight) { isEnable = false; CTransition.enabledTransition.Remove(transition); break; }
+						if(!arc.isInhibitor)
+							if (arc.edge.edge.Item1.tokens < arc.weight)
+							{ isEnable = false; CTransition.enabledTransition.Remove(transition); break; }
+						if(arc.isInhibitor && arc.edge.edge.Item1.tokens > 0)
+						{ isEnable = false; CTransition.enabledTransition.Remove(transition); break; }
 					}
 					transition.isEnable = isEnable;
 					if (isEnable)
@@ -31,6 +48,7 @@ namespace PetriNetsClassLibrary
 				else transition.isEnable = false;
 			}
 		}
+
 
 	}
 }
