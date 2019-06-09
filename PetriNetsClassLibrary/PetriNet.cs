@@ -17,6 +17,11 @@ namespace PetriNetsClassLibrary
 		public static CTransition CTransition = new CTransition();
 
 		/// <summary>
+		/// Стэк для хранения выстрельнутых переходов MTransition 
+		/// </summary>
+		public static Stack<MTransition> FiredTransitions = new Stack<MTransition>();
+
+		/// <summary>
 		/// Метод устанавливающий поле isEnable для всех переходов MTransition из CTransition.
 		/// А так же записывающий включеные переход MTransition
 		/// </summary>
@@ -39,6 +44,7 @@ namespace PetriNetsClassLibrary
 				else transition.isEnable = false;
 			}
 		}
+
 
 	}
 }

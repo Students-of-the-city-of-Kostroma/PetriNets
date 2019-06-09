@@ -83,6 +83,16 @@ namespace PetriNets.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap Back {
+            get {
+                object obj = ResourceManager.GetObject("Back", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap circle {
             get {
                 object obj = ResourceManager.GetObject("circle", resourceCulture);
@@ -126,6 +136,16 @@ namespace PetriNets.Properties {
         internal static System.Drawing.Bitmap cursour {
             get {
                 object obj = ResourceManager.GetObject("cursour", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Forward {
+            get {
+                object obj = ResourceManager.GetObject("Forward", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

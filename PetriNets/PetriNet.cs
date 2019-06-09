@@ -224,7 +224,8 @@ namespace PetriNets
 				if(selectedShape != null && selectedShape is TRectangle)
 				{
 					//Выполнение сети Петри
-					PetriNetsClassLibrary.PetriNet.CTransition.exchangeTokens((selectedShape as TRectangle).model);
+					PetriNetsClassLibrary.PetriNet.CTransition.fireTransition((selectedShape as TRectangle).model);
+					if (PetriNetsClassLibrary.PetriNet.FiredTransitions.Count > 0) back.Enabled = true;
 				}
 				PetriNetsClassLibrary.PetriNet.setRule();
 				this.Invalidate();
@@ -367,7 +368,7 @@ namespace PetriNets
 		{
 			try
 			{
-				TRectangle rectangle = new TRectangle(Location, 50, 50, "t" + unicalLabelId++);
+				TRectangle rectangle = new TRectangle(Location, 50, 20, "t" + unicalLabelId++);
 				Shapes.Add(rectangle);
 				rectangles.Add(rectangle);
 				Graphics g = this.CreateGraphics();
@@ -671,14 +672,30 @@ namespace PetriNets
 		private void stop_Click(object sender, EventArgs e)
 		{
 			isEvaluating = false;
+			while(PetriNetsClassLibrary.PetriNet.FiredTransitions.Count > 0)
+			{
+				PetriNetsClassLibrary.PetriNet.CTransition.unfireTransition();
+			}
 			this.Invalidate();
 			Cursor = Cursors.Default;
 		}
 
-		private void bindingNavigatorMoveFirstItem_Click(object sender, EventArgs e)
+		/// <summary>
+		/// Вернуться на шаг назад в выполнении сети Петри
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void back_Click(object sender, EventArgs e)
 		{
-
+			if (isEvaluating)
+			{
+				PetriNetsClassLibrary.PetriNet.CTransition.unfireTransition();
+				if (PetriNetsClassLibrary.PetriNet.FiredTransitions.Count == 0) {
+					back.Enabled = false; }
+			}
+			this.Invalidate();
 		}
+
 	}
 
 
@@ -1318,7 +1335,7 @@ namespace PetriNets
 			TRectangle rectangle;
 			List<MArc> lines; 
 			if(this.startShape is Circle) { circle = (Circle)this.startShape; rectangle = (TRectangle)this.endShape; lines = ((TRectangle)this.endShape).model.inPlaces;  }
-			else { circle = (Circle)this.endShape; rectangle = (TRectangle)this.startShape; lines = ((TRectangle)this.endShape).model.outPlaces;  }
+			else { circle = (Circle)this.endShape; rectangle = (TRectangle)this.startShape; lines = ((TRectangle)this.startShape).model.outPlaces;  }
 			circle.inLines.Remove(this);
 			PetriNetsClassLibrary.PetriNet.CTransition.removeLink(this.mArc, lines);
 			rectangle.inLines.Remove(this);
