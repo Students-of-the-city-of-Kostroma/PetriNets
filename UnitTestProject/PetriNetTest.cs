@@ -7,6 +7,7 @@ using PetriNetsClassLibrary;
 
 namespace PetriNetTests
 {
+
 	[TestClass]
 	public class PetriNetTest
 	{
@@ -47,49 +48,9 @@ namespace PetriNetTests
 		}
 
 		[TestMethod]
-		public void DellCircle()
-		{
-			Point Loc = new Point(30, -30);
-			bool expected = true;
-			PetriNets.PetriNet p = new PetriNets.PetriNet();
-			bool actual2 = p.DrawCircle(Loc);
-			bool actual = p.deleteElement(Loc);
-			Assert.AreEqual(expected, actual);
-		}
-
-		[TestMethod]
-		public void DellRectangle()
-		{
-			Point Loc = new Point(30, -30);
-			bool expected = true;
-			PetriNets.PetriNet p = new PetriNets.PetriNet();
-			bool actual2 = p.DrawRectangle(Loc);
-			bool actual = p.deleteElement(Loc);
-			Assert.AreEqual(expected, actual);
-		}
-
-		[TestMethod]
-		public void DellLine()
-		{
-			Point Loc = new Point(30, -30);
-			Point Loc2 = new Point(60, -30);
-			Point Loc3 = new Point(45, -30);
-			bool expected = true;
-			PetriNets.PetriNet p = new PetriNets.PetriNet();
-			p.DrawCircle(Loc);
-			p.DrawRectangle(Loc2);
-			p.hitTest(Loc);
-			p.createNewLine(Loc);
-			p.hitTest(Loc2);
-			p.resizingLine(Loc2);
-			bool actual = p.deleteElement(Loc3);
-			Assert.AreEqual(expected, actual);
-		}
-
-		[TestMethod]
 		public void AddArc()
 		{
-			MTransition mTransition = new MTransition("Игорь");			
+			MTransition mTransition = new MTransition("Игорь");
 			MPlace mPlace = new MPlace("Олег");
 			MArc arc = new MArc(mPlace, mTransition, true);
 			bool expected = true;
