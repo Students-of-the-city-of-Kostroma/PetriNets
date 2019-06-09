@@ -31,17 +31,7 @@
 			this.components = new System.ComponentModel.Container();
 			this.bindingNavigator1 = new System.Windows.Forms.BindingNavigator(this.components);
 			this.bindingNavigatorSeparator2 = new System.Windows.Forms.ToolStripSeparator();
-			this.circle = new System.Windows.Forms.ToolStripButton();
-			this.rectangle = new System.Windows.Forms.ToolStripButton();
-			this.line = new System.Windows.Forms.ToolStripButton();
-			this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
-			this.toolStripButton2 = new System.Windows.Forms.ToolStripButton();
-			this.Save = new System.Windows.Forms.ToolStripButton();
-			this.Open = new System.Windows.Forms.ToolStripButton();
 			this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
-			this.btPlay = new System.Windows.Forms.ToolStripButton();
-			this.stop = new System.Windows.Forms.ToolStripButton();
-			this.back = new System.Windows.Forms.ToolStripButton();
 			this.tbEdit = new System.Windows.Forms.ToolStripMenuItem();
 			this.cmPlace = new System.Windows.Forms.ContextMenuStrip(this.components);
 			this.editNumberOfTokens = new System.Windows.Forms.ToolStripMenuItem();
@@ -56,6 +46,17 @@
 			this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
 			this.tsmDeleteTransition = new System.Windows.Forms.ToolStripMenuItem();
 			this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
+			this.circle = new System.Windows.Forms.ToolStripButton();
+			this.rectangle = new System.Windows.Forms.ToolStripButton();
+			this.line = new System.Windows.Forms.ToolStripButton();
+			this.inhibitorArc = new System.Windows.Forms.ToolStripButton();
+			this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
+			this.toolStripButton2 = new System.Windows.Forms.ToolStripButton();
+			this.Save = new System.Windows.Forms.ToolStripButton();
+			this.Open = new System.Windows.Forms.ToolStripButton();
+			this.btPlay = new System.Windows.Forms.ToolStripButton();
+			this.stop = new System.Windows.Forms.ToolStripButton();
+			this.back = new System.Windows.Forms.ToolStripButton();
 			((System.ComponentModel.ISupportInitialize)(this.bindingNavigator1)).BeginInit();
 			this.bindingNavigator1.SuspendLayout();
 			this.cmPlace.SuspendLayout();
@@ -73,6 +74,7 @@
             this.circle,
             this.rectangle,
             this.line,
+            this.inhibitorArc,
             this.toolStripButton1,
             this.toolStripButton2,
             this.Save,
@@ -97,111 +99,10 @@
 			this.bindingNavigatorSeparator2.Name = "bindingNavigatorSeparator2";
 			this.bindingNavigatorSeparator2.Size = new System.Drawing.Size(6, 25);
 			// 
-			// circle
-			// 
-			this.circle.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.circle.Image = global::PetriNets.Properties.Resources.circle;
-			this.circle.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.circle.Name = "circle";
-			this.circle.Size = new System.Drawing.Size(23, 22);
-			this.circle.Text = "toolStripButton1";
-			this.circle.Click += new System.EventHandler(this.circle_Click);
-			// 
-			// rectangle
-			// 
-			this.rectangle.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.rectangle.Image = global::PetriNets.Properties.Resources.rectangle;
-			this.rectangle.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.rectangle.Name = "rectangle";
-			this.rectangle.Size = new System.Drawing.Size(23, 22);
-			this.rectangle.Text = "toolStripButton2";
-			this.rectangle.Click += new System.EventHandler(this.rectangle_Click);
-			// 
-			// line
-			// 
-			this.line.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.line.Image = global::PetriNets.Properties.Resources.line;
-			this.line.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.line.Name = "line";
-			this.line.Size = new System.Drawing.Size(23, 22);
-			this.line.Text = "toolStripButton3";
-			this.line.Click += new System.EventHandler(this.line_Click);
-			// 
-			// toolStripButton1
-			// 
-			this.toolStripButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.toolStripButton1.Image = global::PetriNets.Properties.Resources.cursour;
-			this.toolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.toolStripButton1.Name = "toolStripButton1";
-			this.toolStripButton1.Size = new System.Drawing.Size(23, 22);
-			this.toolStripButton1.Text = "toolStripButton1";
-			this.toolStripButton1.Click += new System.EventHandler(this.toolStripButton1_Click);
-			// 
-			// toolStripButton2
-			// 
-			this.toolStripButton2.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.toolStripButton2.Image = global::PetriNets.Properties.Resources.cross;
-			this.toolStripButton2.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.toolStripButton2.Name = "toolStripButton2";
-			this.toolStripButton2.Size = new System.Drawing.Size(23, 22);
-			this.toolStripButton2.Text = "toolStripButton2";
-			this.toolStripButton2.Click += new System.EventHandler(this.toolStripButton2_Click);
-			// 
-			// Save
-			// 
-			this.Save.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.Save.Image = global::PetriNets.Properties.Resources.computer_icons_icon_design_iconfinder_save_icon;
-			this.Save.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.Save.Name = "Save";
-			this.Save.Size = new System.Drawing.Size(23, 22);
-			this.Save.Text = "toolStripButton3";
-			this.Save.Click += new System.EventHandler(this.Save_Click);
-			// 
-			// Open
-			// 
-			this.Open.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.Open.Image = global::PetriNets.Properties.Resources._36792_3_folders_file;
-			this.Open.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.Open.Name = "Open";
-			this.Open.Size = new System.Drawing.Size(23, 22);
-			this.Open.Text = "toolStripButton3";
-			this.Open.Click += new System.EventHandler(this.Open_Click);
-			// 
 			// toolStripSeparator4
 			// 
 			this.toolStripSeparator4.Name = "toolStripSeparator4";
 			this.toolStripSeparator4.Size = new System.Drawing.Size(6, 25);
-			// 
-			// btPlay
-			// 
-			this.btPlay.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.btPlay.Image = global::PetriNets.Properties.Resources.Animation_mode;
-			this.btPlay.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.btPlay.Name = "btPlay";
-			this.btPlay.Size = new System.Drawing.Size(23, 22);
-			this.btPlay.Text = "toolStripButton3";
-			this.btPlay.Click += new System.EventHandler(this.bindingNavigatorMoveNextItem_Click);
-			// 
-			// stop
-			// 
-			this.stop.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.stop.Image = global::PetriNets.Properties.Resources.stop;
-			this.stop.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.stop.Name = "stop";
-			this.stop.Size = new System.Drawing.Size(23, 22);
-			this.stop.Text = "toolStripButton2";
-			this.stop.Click += new System.EventHandler(this.stop_Click);
-			// 
-			// back
-			// 
-			this.back.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.back.Enabled = false;
-			this.back.Image = global::PetriNets.Properties.Resources.Back;
-			this.back.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.back.Name = "back";
-			this.back.Size = new System.Drawing.Size(23, 22);
-			this.back.Text = "toolStripButton3";
-			this.back.Click += new System.EventHandler(this.back_Click);
 			// 
 			// tbEdit
 			// 
@@ -300,6 +201,117 @@
 			// 
 			this.openFileDialog1.FileName = "openFileDialog1";
 			// 
+			// circle
+			// 
+			this.circle.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.circle.Image = global::PetriNets.Properties.Resources.circle;
+			this.circle.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.circle.Name = "circle";
+			this.circle.Size = new System.Drawing.Size(23, 22);
+			this.circle.Text = "toolStripButton1";
+			this.circle.Click += new System.EventHandler(this.circle_Click);
+			// 
+			// rectangle
+			// 
+			this.rectangle.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.rectangle.Image = global::PetriNets.Properties.Resources.rectangle;
+			this.rectangle.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.rectangle.Name = "rectangle";
+			this.rectangle.Size = new System.Drawing.Size(23, 22);
+			this.rectangle.Text = "toolStripButton2";
+			this.rectangle.Click += new System.EventHandler(this.rectangle_Click);
+			// 
+			// line
+			// 
+			this.line.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.line.Image = global::PetriNets.Properties.Resources.Arc;
+			this.line.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.line.Name = "line";
+			this.line.Size = new System.Drawing.Size(23, 22);
+			this.line.Text = "toolStripButton3";
+			this.line.Click += new System.EventHandler(this.line_Click);
+			// 
+			// inhibitorArc
+			// 
+			this.inhibitorArc.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.inhibitorArc.Image = global::PetriNets.Properties.Resources.InhibitorArc;
+			this.inhibitorArc.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.inhibitorArc.Name = "inhibitorArc";
+			this.inhibitorArc.Size = new System.Drawing.Size(23, 22);
+			this.inhibitorArc.Text = "toolStripButton3";
+			this.inhibitorArc.Click += new System.EventHandler(this.inhibitorArc_Click);
+			// 
+			// toolStripButton1
+			// 
+			this.toolStripButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.toolStripButton1.Image = global::PetriNets.Properties.Resources.cursour;
+			this.toolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.toolStripButton1.Name = "toolStripButton1";
+			this.toolStripButton1.Size = new System.Drawing.Size(23, 22);
+			this.toolStripButton1.Text = "toolStripButton1";
+			this.toolStripButton1.Click += new System.EventHandler(this.toolStripButton1_Click);
+			// 
+			// toolStripButton2
+			// 
+			this.toolStripButton2.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.toolStripButton2.Image = global::PetriNets.Properties.Resources.cross;
+			this.toolStripButton2.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.toolStripButton2.Name = "toolStripButton2";
+			this.toolStripButton2.Size = new System.Drawing.Size(23, 22);
+			this.toolStripButton2.Text = "toolStripButton2";
+			this.toolStripButton2.Click += new System.EventHandler(this.toolStripButton2_Click);
+			// 
+			// Save
+			// 
+			this.Save.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.Save.Image = global::PetriNets.Properties.Resources.computer_icons_icon_design_iconfinder_save_icon;
+			this.Save.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.Save.Name = "Save";
+			this.Save.Size = new System.Drawing.Size(23, 22);
+			this.Save.Text = "toolStripButton3";
+			this.Save.Click += new System.EventHandler(this.Save_Click);
+			// 
+			// Open
+			// 
+			this.Open.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.Open.Image = global::PetriNets.Properties.Resources._36792_3_folders_file;
+			this.Open.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.Open.Name = "Open";
+			this.Open.Size = new System.Drawing.Size(23, 22);
+			this.Open.Text = "toolStripButton3";
+			this.Open.Click += new System.EventHandler(this.Open_Click);
+			// 
+			// btPlay
+			// 
+			this.btPlay.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.btPlay.Image = global::PetriNets.Properties.Resources.Animation_mode;
+			this.btPlay.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.btPlay.Name = "btPlay";
+			this.btPlay.Size = new System.Drawing.Size(23, 22);
+			this.btPlay.Text = "toolStripButton3";
+			this.btPlay.Click += new System.EventHandler(this.bindingNavigatorMoveNextItem_Click);
+			// 
+			// stop
+			// 
+			this.stop.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.stop.Image = global::PetriNets.Properties.Resources.stop;
+			this.stop.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.stop.Name = "stop";
+			this.stop.Size = new System.Drawing.Size(23, 22);
+			this.stop.Text = "toolStripButton2";
+			this.stop.Click += new System.EventHandler(this.stop_Click);
+			// 
+			// back
+			// 
+			this.back.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.back.Enabled = false;
+			this.back.Image = global::PetriNets.Properties.Resources.Back;
+			this.back.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.back.Name = "back";
+			this.back.Size = new System.Drawing.Size(23, 22);
+			this.back.Text = "toolStripButton3";
+			this.back.Click += new System.EventHandler(this.back_Click);
+			// 
 			// PetriNet
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -351,5 +363,6 @@
 		private System.Windows.Forms.ToolStripButton btPlay;
 		private System.Windows.Forms.ToolStripButton back;
 		private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
+		private System.Windows.Forms.ToolStripButton inhibitorArc;
 	}
 }

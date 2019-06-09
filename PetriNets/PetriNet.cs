@@ -21,6 +21,10 @@ namespace PetriNets
 	public partial class PetriNet : Form
 	{
 		/// <summary>
+		/// Тип рисуемой линии
+		/// </summary>
+		bool isInhibitor;
+		/// <summary>
 		/// Хранение фигур отображенных на форме
 		/// </summary>
 		public List<IShape> Shapes { get; private set; }
@@ -281,6 +285,7 @@ namespace PetriNets
 		/// <param name="e"></param>
 		private void line_Click(object sender, EventArgs e)
 		{
+			isInhibitor = false;
 			isDeliting = false;
 			isLinening = true;
 			DrawElement = null;
@@ -389,9 +394,11 @@ namespace PetriNets
 		/// <returns></returns>
 		private bool createNewLine(Point location)
 		{
+			if (isInhibitor && selectedShape is TRectangle)
+				return false;
 			try
 			{
-				Line line = new Line();
+				Line line = new Line(isInhibitor);
 				line.points.Add(selectedShape.getCenter());
 				line.points.Add(new PointF(selectedShape.getCenter().X + 1, selectedShape.getCenter().Y + 1));
 				Shapes.Insert(0, line);
@@ -455,7 +462,11 @@ namespace PetriNets
 					return;
 				}
 				curLine.points.RemoveAt(curLine.points.Count - 1);
-				curLine.points.Add((selectedShape as INotArch).getClosestEdge(location));
+				var p = (selectedShape as INotArch).getClosestEdge(location);
+				if (!isInhibitor)
+					curLine.points.Add(p);
+				if (isInhibitor)
+					curLine.points.Add(new PointF(p.X - 5, p.Y));
 				(selectedShape as INotArch).getLines().Add(curLine);
 				selectedShape.Unselect();
 				selectedShape = null;
@@ -696,6 +707,14 @@ namespace PetriNets
 			this.Invalidate();
 		}
 
+		private void inhibitorArc_Click(object sender, EventArgs e)
+		{
+			isInhibitor = true;
+			isDeliting = false;
+			isLinening = true;
+			DrawElement = null;
+			this.Cursor = Cursors.Arrow;
+		}
 	}
 
 
@@ -1171,13 +1190,13 @@ namespace PetriNets
 			float B = edgeEnd.X - edgeStart.X;
 			float C = edgeStart.X * edgeEnd.Y - edgeEnd.X * edgeStart.Y;
 			float ab = A * A + B * B;
-			float cx = (float)(B*(B*p.X - A*p.Y) - A*C) / (float)ab;
-			float cy = (float)(A*((-B)*p.X+A*p.Y)- B*C) / (float)ab;
+			float cx = ((B * B * p.X - A * (B * p.Y + C)) / (float)ab);
+			float cy = (float)(A * ((-B) * p.X + A * p.Y) - B * C) / (float)ab;
 			lever = Math.Abs((A * (p.Y - edgeStart.Y) + B * (edgeStart.X - p.X)) / ab);
 			distance = (float)Math.Abs(A*p.X + B*p.Y + C) / (float)Math.Sqrt(ab);
-			if (cx < edgeStart.X || cx > edgeEnd.X)
+			if (cx > edgeStart.X || cx < edgeEnd.X)
 				cx = (edgeStart.X + edgeEnd.X) / 2;
-			if (cy < edgeStart.Y || cy > edgeEnd.Y)
+			if (cy > edgeStart.Y || cy < edgeEnd.Y)
 				cy = (edgeStart.Y + edgeEnd.Y) / 2;
 			return new PointF(cx, cy);
 		}
@@ -1190,6 +1209,10 @@ namespace PetriNets
 	public class Line : IShape
 	{
 		/// <summary>
+		/// Определяет тип линии: обычная или inhibitor
+		/// </summary>
+		bool isInhibitor;
+		/// <summary>
 		/// Цвет рисования
 		/// </summary>
 		private Color DefaultColor = Color.Black;
@@ -1200,7 +1223,12 @@ namespace PetriNets
 		/// <summary>
 		/// Конструктор выставляющий по дефолту некоторые переменные
 		/// </summary>
-		public Line() { LineWidth = 2; LineColor = Color.Black; points = new List<PointF>(); mArc = new MArc(); }
+		public Line(bool isInhibitor)
+		{
+			LineWidth = 2; LineColor = Color.Black; points = new List<PointF>(); mArc = new MArc(isInhibitor);
+			this.isInhibitor = isInhibitor;
+		}
+		
 		/// <summary>
 		/// Шрифт для рисования некоторых подсказок на линии
 		/// </summary>
@@ -1263,12 +1291,14 @@ namespace PetriNets
 		public void Draw(Graphics g)
 		{
 			var pen = new Pen(LineColor, LineWidth + 2);
-			pen.EndCap = LineCap.ArrowAnchor;
+			if(!isInhibitor)
+				pen.EndCap = LineCap.ArrowAnchor;
+			if (isInhibitor)
+				pen.EndCap = LineCap.RoundAnchor;
 			using (var path = GetPath())
 			{
 				g.DrawPath(pen, path);
-				//Подскаска о конце линии
-				g.DrawString("in", font.ToFont(), Brushes.Brown, points[points.Count-1].X - 40 , points[points.Count - 1].Y - 20);
+				g.DrawString("In", font.ToFont(), Brushes.Brown, points[points.Count - 1].X - 40, points[points.Count - 1].Y - 20);
 				//Подсказска о весе линии
 				g.DrawString(String.Format("[{0}]", mArc.weight), font.ToFont(), Brushes.Brown, points[(points.Count - 1)/2].X, points[(points.Count - 1) / 2].Y + 20);
 			}
