@@ -57,6 +57,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\PetriNetsClassLibrary\PetriNetsClassLibrary.csproj">
+      <Project>{6FBECF50-F7CC-4250-9D76-E4DAB2011658}</Project>
+      <Name>PetriNetsClassLibrary</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PetriNets\PetriNets.csproj">
       <Project>{43334532-E2DE-4CCA-A06D-2C10D4A1AC24}</Project>
       <Name>PetriNets</Name>

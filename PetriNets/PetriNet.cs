@@ -428,7 +428,7 @@ namespace PetriNets
 			if (startShape is TRectangle) { if (endShape is Circle) { return true; } }
 			return false;
 		}
-		private void hitTest(Point location)
+		public void hitTest(Point location)
 		{
 			for (var i = Shapes.Count - 1; i >= 0; i--)
 				if (Shapes[i].HitTest(location)) { if (!(Shapes[i] is Line)) { selectedShape = Shapes[i]; break; } }
@@ -443,7 +443,7 @@ namespace PetriNets
 		/// Добавление новой точки в кривую и проверка валидности в случае если попали в объект
 		/// </summary>
 		/// <param name="location">точка для добавления</param>
-		private void resizingLine(Point location)
+		public bool resizingLine(Point location)
 		{
 			if(selectedShape == null)
 				curLine.points.Add(location);
@@ -459,7 +459,7 @@ namespace PetriNets
 					selectedShape.Unselect();
 					selectedShape = null;
 					curLine = null;
-					return;
+					return false;
 				}
 				curLine.points.RemoveAt(curLine.points.Count - 1);
 				var p = (selectedShape as INotArch).getClosestEdge(location);
@@ -471,8 +471,10 @@ namespace PetriNets
 				selectedShape.Unselect();
 				selectedShape = null;
 				curLine = null;
+				return true;
 			}
 			this.Invalidate();
+			return false;
 		}
 
 		/// <summary>
