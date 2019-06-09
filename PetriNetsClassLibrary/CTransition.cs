@@ -80,6 +80,10 @@ namespace PetriNetsClassLibrary
 			return transition.isEnable;
 		}
 
+		/// <summary>
+		/// Сделать обратный переход для позиции лежащей на вершине стека FiredTransitions
+		/// </summary>
+		/// <returns>Результат обратного перехода</returns>
 		public bool unfireTransition()
 		{
 			try {

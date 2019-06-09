@@ -16,6 +16,9 @@ namespace PetriNetsClassLibrary
 		/// </summary>
 		public static CTransition CTransition = new CTransition();
 
+		/// <summary>
+		/// Стэк для хранения выстрельнутых переходов MTransition 
+		/// </summary>
 		public static Stack<MTransition> FiredTransitions = new Stack<MTransition>();
 
 		/// <summary>

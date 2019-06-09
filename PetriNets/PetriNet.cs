@@ -680,6 +680,11 @@ namespace PetriNets
 			Cursor = Cursors.Default;
 		}
 
+		/// <summary>
+		/// Вернуться на шаг назад в выполнении сети Петри
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void back_Click(object sender, EventArgs e)
 		{
 			if (isEvaluating)
