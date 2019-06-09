@@ -161,5 +161,8 @@
   <ItemGroup>
     <None Include="Resources\Arc.png" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Properties\Random.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
